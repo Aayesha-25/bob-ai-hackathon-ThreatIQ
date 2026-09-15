@@ -1,0 +1,1572 @@
+{% extends "base.html" %}
+
+{% block title %}
+ARES — Intelligence Sources
+{% endblock %}
+
+{% block page_title %}
+Intelligence Sources
+{% endblock %}
+
+{% block content %}
+
+
+
+<!-- =========================================================
+     PAGE HEADER
+     ========================================================= -->
+
+<div class="flex flex-col lg:flex-row justify-between gap-4 mb-6">
+
+    <div>
+
+        <p class="text-[9px] text-cyan-400 tracking-widest">
+            SOURCE MONITORING
+        </p>
+
+        <h2 class="text-xl font-semibold text-white mt-1">
+            Intelligence Sources
+        </h2>
+
+        <p class="text-xs text-slate-500 mt-2 max-w-2xl">
+            Monitor simulated alert and intelligence feeds used by
+            the ARES correlation and prioritisation workflow.
+        </p>
+
+    </div>
+
+
+    <div class="flex items-center gap-2">
+
+        <span
+            class="
+                px-3
+                py-2
+                rounded-md
+                border
+                border-green-500/20
+                bg-green-500/5
+                text-[9px]
+                text-green-400
+            "
+        >
+            ● SIMULATION ACTIVE
+        </span>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     SOURCE SUMMARY
+     ========================================================= -->
+
+<div
+    class="
+        grid
+        grid-cols-1
+        sm:grid-cols-2
+        lg:grid-cols-4
+        gap-4
+        mb-6
+    "
+>
+
+    <div class="panel rounded-lg p-4">
+
+        <p class="text-[9px] text-slate-500 tracking-widest">
+            ACTIVE SOURCES
+        </p>
+
+        <p
+            id="activeSourcesCount"
+            class="text-2xl font-bold text-cyan-400 mt-2"
+        >
+            —
+        </p>
+
+        <p class="text-[10px] text-slate-600 mt-2">
+            Simulated feeds
+        </p>
+
+    </div>
+
+
+    <div class="panel rounded-lg p-4">
+
+        <p class="text-[9px] text-slate-500 tracking-widest">
+            EVENTS INGESTED
+        </p>
+
+        <p
+            id="eventsIngestedCount"
+            class="text-2xl font-bold text-purple-400 mt-2"
+        >
+            —
+        </p>
+
+        <p class="text-[10px] text-slate-600 mt-2">
+            Current demo dataset
+        </p>
+
+    </div>
+
+
+    <div class="panel rounded-lg p-4">
+
+        <p class="text-[9px] text-slate-500 tracking-widest">
+            AVG RELIABILITY
+        </p>
+
+        <p
+            id="avgReliability"
+            class="text-2xl font-bold text-green-400 mt-2"
+        >
+            —
+        </p>
+
+        <p class="text-[10px] text-slate-600 mt-2">
+            Simulated source confidence
+        </p>
+
+    </div>
+
+
+    <div class="panel rounded-lg p-4">
+
+        <p class="text-[9px] text-slate-500 tracking-widest">
+            LAST EVENT
+        </p>
+
+        <p
+            id="lastEventAgo"
+            class="text-2xl font-bold text-amber-400 mt-2"
+        >
+            —
+        </p>
+
+        <p class="text-[10px] text-slate-600 mt-2">
+            Simulated timestamp
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     SOURCE CARDS
+     ========================================================= -->
+
+<div
+    id="sourceGrid"
+    class="
+        grid
+        grid-cols-1
+        md:grid-cols-2
+        xl:grid-cols-3
+        gap-5
+    "
+>
+</div>
+
+
+<!-- =========================================================
+     SOURCE DETAIL MODAL
+     ========================================================= -->
+
+<div
+    id="sourceModal"
+    class="
+        fixed
+        inset-0
+        z-50
+        hidden
+        items-center
+        justify-center
+        bg-black/70
+        backdrop-blur-sm
+        p-4
+    "
+>
+
+    <div
+        class="
+            w-full
+            max-w-2xl
+            max-h-[90vh]
+            overflow-y-auto
+            bg-[#09111D]
+            border
+            border-[#1C3048]
+            rounded-xl
+            shadow-2xl
+        "
+    >
+
+        <div
+            class="
+                flex
+                justify-between
+                items-center
+                px-6
+                py-4
+                border-b
+                border-[#1C3048]
+            "
+        >
+
+            <div>
+
+                <p class="text-[9px] text-cyan-400 tracking-widest">
+                    SOURCE DETAILS
+                </p>
+
+                <h2
+                    id="sourceModalTitle"
+                    class="text-base font-semibold text-white mt-1"
+                >
+                    Source
+                </h2>
+
+            </div>
+
+
+            <button
+                id="closeSourceModal"
+                class="
+                    text-slate-500
+                    hover:text-white
+                    text-xl
+                "
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="p-6">
+
+            <div
+                class="
+                    grid
+                    grid-cols-1
+                    sm:grid-cols-2
+                    gap-4
+                    mb-5
+                "
+            >
+
+                <div class="source-info-card">
+
+                    <p class="source-label">
+                        STATUS
+                    </p>
+
+                    <p
+                        id="modalSourceStatus"
+                        class="source-value text-green-400"
+                    >
+                        DEMO ACTIVE
+                    </p>
+
+                </div>
+
+
+                <div class="source-info-card">
+
+                    <p class="source-label">
+                        RELIABILITY
+                    </p>
+
+                    <p
+                        id="modalSourceReliability"
+                        class="source-value"
+                    >
+                        —
+                    </p>
+
+                </div>
+
+
+                <div class="source-info-card">
+
+                    <p class="source-label">
+                        EVENT COUNT
+                    </p>
+
+                    <p
+                        id="modalSourceEvents"
+                        class="source-value"
+                    >
+                        —
+                    </p>
+
+                </div>
+
+
+                <div class="source-info-card">
+
+                    <p class="source-label">
+                        LAST SIMULATED EVENT
+                    </p>
+
+                    <p
+                        id="modalSourceLastEvent"
+                        class="source-value"
+                    >
+                        —
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="mb-5">
+
+                <p class="source-label mb-2">
+                    DESCRIPTION
+                </p>
+
+                <div
+                    id="modalSourceDescription"
+                    class="
+                        bg-[#081321]
+                        border
+                        border-[#1C3048]
+                        rounded-lg
+                        p-4
+                        text-xs
+                        text-slate-300
+                        leading-6
+                    "
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <p class="source-label mb-2">
+                    SIMULATED EVENT TYPES
+                </p>
+
+                <div
+                    id="modalSourceEventsList"
+                    class="flex flex-wrap gap-2"
+                >
+                </div>
+
+            </div>
+
+
+            <div
+                class="
+                    mt-6
+                    p-4
+                    rounded-lg
+                    border
+                    border-amber-500/20
+                    bg-amber-500/5
+                "
+            >
+
+                <p class="text-[10px] text-amber-400 font-semibold">
+                    DEMO ONLY
+                </p>
+
+                <p class="text-[10px] text-slate-500 mt-1 leading-5">
+                    This source is represented entirely by frontend
+                    simulation data. No connection to an external
+                    security platform is active.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<style>
+
+    .source-card {
+
+        background: #0B1523;
+        border: 1px solid #1C3048;
+        border-radius: 10px;
+        padding: 20px;
+        transition: all .2s ease;
+
+    }
+
+
+    .source-card:hover {
+
+        border-color: #2B4968;
+        transform: translateY(-2px);
+
+    }
+
+
+    .source-info-card {
+
+        background: #081321;
+        border: 1px solid #1C3048;
+        border-radius: 8px;
+        padding: 14px;
+
+    }
+
+
+    .source-label {
+
+        font-size: 9px;
+        color: #64748B;
+        letter-spacing: .08em;
+
+    }
+
+
+    .source-value {
+
+        font-size: 12px;
+        color: #E2E8F0;
+        margin-top: 6px;
+
+    }
+
+
+    .source-icon {
+
+        width: 42px;
+        height: 42px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
+        font-weight: 700;
+
+    }
+
+
+    .source-event-tag {
+
+        padding: 5px 8px;
+        border-radius: 4px;
+        border: 1px solid #1C3048;
+        background: #0B1726;
+        color: #94A3B8;
+        font-size: 9px;
+
+    }
+
+</style>
+
+
+<script>
+
+/* =========================================================
+   SOURCE PRESENTATION METADATA
+   ========================================================= */
+
+const intelligenceSources = [
+
+    {
+
+        id: "siem",
+
+        name: "SIEM Alerts",
+
+        shortName: "SIEM",
+
+        icon: "S",
+
+        iconClass:
+            "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20",
+
+        status: "Demo Active",
+
+        reliability: "94%",
+
+        description:
+            "Simulated centralized security alerts representing events normally aggregated from enterprise security monitoring systems.",
+
+        eventTypes: [
+
+            "Authentication",
+            "Endpoint",
+            "Policy Violation",
+            "Privilege Activity"
+
+        ]
+
+    },
+
+
+    {
+
+        id: "network",
+
+        name: "Network Sensor Alerts",
+
+        shortName: "NET",
+
+        icon: "N",
+
+        iconClass:
+            "bg-purple-500/10 text-purple-400 border border-purple-500/20",
+
+        status: "Demo Active",
+
+        reliability: "89%",
+
+        description:
+            "Simulated network detection events representing suspicious traffic, scanning behaviour and network anomalies.",
+
+        eventTypes: [
+
+            "Port Scan",
+            "Suspicious Traffic",
+            "DNS Anomaly",
+            "Lateral Movement"
+
+        ]
+
+    },
+
+
+    {
+
+        id: "auth",
+
+        name: "Authentication Logs",
+
+        shortName: "AUTH",
+
+        icon: "A",
+
+        iconClass:
+            "bg-green-500/10 text-green-400 border border-green-500/20",
+
+        status: "Demo Active",
+
+        reliability: "96%",
+
+        description:
+            "Simulated authentication records used to identify unusual login patterns, credential abuse and account anomalies.",
+
+        eventTypes: [
+
+            "Failed Login",
+            "Impossible Travel",
+            "New Device",
+            "Privilege Change"
+
+        ]
+
+    },
+
+
+    {
+
+        id: "paloalto",
+
+        name: "Palo Alto Alerts",
+
+        shortName: "PA",
+
+        icon: "P",
+
+        iconClass:
+            "bg-orange-500/10 text-orange-400 border border-orange-500/20",
+
+        status: "Demo Active",
+
+        reliability: "91%",
+
+        description:
+            "Simulated firewall and security alert data representing perimeter and network security detections.",
+
+        eventTypes: [
+
+            "Threat Prevention",
+            "URL Filtering",
+            "Command & Control",
+            "Malware Detection"
+
+        ]
+
+    },
+
+
+    {
+
+        id: "intel",
+
+        name: "Threat Intelligence Reports",
+
+        shortName: "TI",
+
+        icon: "T",
+
+        iconClass:
+            "bg-red-500/10 text-red-400 border border-red-500/20",
+
+        status: "Demo Active",
+
+        reliability: "87%",
+
+        description:
+            "Simulated threat intelligence observations containing indicators, threat context and campaign associations.",
+
+        eventTypes: [
+
+            "IP Indicator",
+            "Domain Indicator",
+            "Hash Indicator",
+            "Campaign Context"
+
+        ]
+
+    }
+
+];
+
+
+/* =========================================================
+   BACKEND SOURCE ID MAPPING
+   ========================================================= */
+
+const backendSourceIds = {
+
+    siem: "siem",
+
+    network: "network_sensor",
+
+    auth: "auth_log",
+
+    paloalto: "firewall",
+
+    intel: "threat_intel"
+
+};
+
+
+let backendSources = [];
+
+let currentSource = null;
+
+
+/* =========================================================
+   TIME FORMATTING
+   ========================================================= */
+
+function formatTimeAgo(timestamp) {
+
+    if (!timestamp) {
+        return "—";
+    }
+
+
+    const eventTime =
+        new Date(timestamp);
+
+
+    if (
+        Number.isNaN(
+            eventTime.getTime()
+        )
+    ) {
+        return "—";
+    }
+
+
+    const now =
+        new Date();
+
+
+    const seconds =
+        Math.max(
+            0,
+            Math.floor(
+                (
+                    now.getTime()
+                    -
+                    eventTime.getTime()
+                ) / 1000
+            )
+        );
+
+
+    if (seconds < 60) {
+        return `${seconds}s`;
+    }
+
+
+    const minutes =
+        Math.floor(
+            seconds / 60
+        );
+
+
+    if (minutes < 60) {
+        return `${minutes}m`;
+    }
+
+
+    const hours =
+        Math.floor(
+            minutes / 60
+        );
+
+
+    if (hours < 24) {
+        return `${hours}h`;
+    }
+
+
+    const days =
+        Math.floor(
+            hours / 24
+        );
+
+
+    return `${days}d`;
+
+}
+
+
+/* =========================================================
+   LOAD SOURCE DATA FROM BACKEND
+   ========================================================= */
+
+async function loadSourceData() {
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/sources"
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `Source API returned ${response.status}`
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        backendSources =
+            Array.isArray(
+                data.sources
+            )
+                ? data.sources
+                : [];
+
+
+        /* -------------------------------------------------
+           SUMMARY — ACTIVE SOURCES
+           ------------------------------------------------- */
+
+        document
+            .getElementById(
+                "activeSourcesCount"
+            )
+            .textContent =
+            data.active_sources
+                ?? backendSources.length;
+
+
+        /* -------------------------------------------------
+           SUMMARY — EVENTS INGESTED
+           ------------------------------------------------- */
+
+        document
+            .getElementById(
+                "eventsIngestedCount"
+            )
+            .textContent =
+            Number(
+                data.events_ingested ?? 0
+            ).toLocaleString();
+
+
+        /* -------------------------------------------------
+           SUMMARY — AVERAGE RELIABILITY
+           
+           Reliability remains presentation/configuration
+           metadata, as agreed in Option A.
+           ------------------------------------------------- */
+
+        const reliabilityValues =
+            intelligenceSources
+                .map(
+                    source =>
+                        parseFloat(
+                            String(
+                                source.reliability
+                            ).replace(
+                                "%",
+                                ""
+                            )
+                        )
+                )
+                .filter(
+                    value =>
+                        Number.isFinite(
+                            value
+                        )
+                );
+
+
+        const averageReliability =
+            reliabilityValues.length
+                ? reliabilityValues.reduce(
+                    (
+                        sum,
+                        value
+                    ) =>
+                        sum + value,
+                    0
+                ) / reliabilityValues.length
+                : 0;
+
+
+        document
+            .getElementById(
+                "avgReliability"
+            )
+            .textContent =
+            reliabilityValues.length
+                ? `${averageReliability.toFixed(1)}%`
+                : "—";
+
+
+        /* -------------------------------------------------
+           SUMMARY — LAST EVENT
+           ------------------------------------------------- */
+
+        const timestamps =
+            backendSources
+                .map(
+                    source =>
+                        source.lastEvent
+                            ? new Date(
+                                source.lastEvent
+                            )
+                            : null
+                )
+                .filter(
+                    date =>
+                        date &&
+                        !Number.isNaN(
+                            date.getTime()
+                        )
+                );
+
+
+        const latestEvent =
+            timestamps.length
+                ? new Date(
+                    Math.max(
+                        ...timestamps.map(
+                            date =>
+                                date.getTime()
+                        )
+                    )
+                )
+                : null;
+
+
+        document
+            .getElementById(
+                "lastEventAgo"
+            )
+            .textContent =
+            latestEvent
+                ? formatTimeAgo(
+                    latestEvent.toISOString()
+                )
+                : "—";
+
+
+        /* -------------------------------------------------
+           MERGE BACKEND OPERATIONAL DATA
+           WITH EXISTING PRESENTATION METADATA
+           ------------------------------------------------- */
+
+        intelligenceSources.forEach(
+            function (source) {
+
+                const backendId =
+                    backendSourceIds[
+                        source.id
+                    ];
+
+
+                const backendSource =
+                    backendSources.find(
+                        item =>
+                            item.id ===
+                            backendId
+                    );
+
+
+                if (!backendSource) {
+                    return;
+                }
+
+
+                source.backendEvents =
+                    backendSource.events
+                    ?? 0;
+
+
+                source.backendLastEvent =
+                    backendSource.lastEvent
+                    ?? null;
+
+            }
+        );
+
+
+        renderSources();
+
+    }
+    catch (error) {
+
+        console.error(
+            "Failed to load source data:",
+            error
+        );
+
+
+        /*
+         * Do not fabricate operational values if
+         * the backend API is unavailable.
+         */
+
+        document
+            .getElementById(
+                "activeSourcesCount"
+            )
+            .textContent =
+            "—";
+
+
+        document
+            .getElementById(
+                "eventsIngestedCount"
+            )
+            .textContent =
+            "—";
+
+
+        document
+            .getElementById(
+                "avgReliability"
+            )
+            .textContent =
+            "—";
+
+
+        document
+            .getElementById(
+                "lastEventAgo"
+            )
+            .textContent =
+            "—";
+
+
+        renderSources();
+
+    }
+
+}
+
+
+/* =========================================================
+   RENDER SOURCE CARDS
+   ========================================================= */
+
+function renderSources() {
+
+    const grid =
+        document.getElementById(
+            "sourceGrid"
+        );
+
+
+    grid.innerHTML = "";
+
+
+    intelligenceSources.forEach(
+        function (source) {
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.className =
+                "source-card";
+
+
+            const eventCount =
+                Number(
+                    source.backendEvents
+                    ?? 0
+                ).toLocaleString();
+
+
+            const lastEvent =
+                source.backendLastEvent
+                    ? formatTimeAgo(
+                        source.backendLastEvent
+                    )
+                    : "—";
+
+
+            card.innerHTML = `
+
+                <!-- HEADER -->
+
+                <div
+                    class="
+                        flex
+                        items-start
+                        justify-between
+                        gap-3
+                    "
+                >
+
+                    <div class="flex items-center gap-3">
+
+                        <div
+                            class="
+                                source-icon
+                                ${source.iconClass}
+                            "
+                        >
+                            ${source.icon}
+                        </div>
+
+
+                        <div>
+
+                            <h3
+                                class="
+                                    text-sm
+                                    font-semibold
+                                    text-white
+                                "
+                            >
+                                ${source.name}
+                            </h3>
+
+                            <p
+                                class="
+                                    text-[9px]
+                                    text-slate-600
+                                    mt-1
+                                "
+                            >
+                                SOURCE-${source.shortName}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <span
+                        class="
+                            px-2
+                            py-1
+                            rounded
+                            border
+                            border-green-500/20
+                            bg-green-500/5
+                            text-[8px]
+                            text-green-400
+                            whitespace-nowrap
+                        "
+                    >
+                        ● DEMO ACTIVE
+                    </span>
+
+                </div>
+
+
+                <!-- DESCRIPTION -->
+
+                <p
+                    class="
+                        text-[10px]
+                        text-slate-500
+                        leading-5
+                        mt-5
+                        min-h-[50px]
+                    "
+                >
+                    ${source.description}
+                </p>
+
+
+                <!-- METRICS -->
+
+                <div
+                    class="
+                        grid
+                        grid-cols-3
+                        gap-2
+                        mt-5
+                    "
+                >
+
+                    <div
+                        class="
+                            bg-[#081321]
+                            border
+                            border-[#1C3048]
+                            rounded-md
+                            p-3
+                        "
+                    >
+
+                        <p class="text-[8px] text-slate-600">
+                            EVENTS
+                        </p>
+
+                        <p
+                            class="
+                                text-sm
+                                font-semibold
+                                text-slate-200
+                                mt-1
+                            "
+                        >
+                            ${eventCount}
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        class="
+                            bg-[#081321]
+                            border
+                            border-[#1C3048]
+                            rounded-md
+                            p-3
+                        "
+                    >
+
+                        <p class="text-[8px] text-slate-600">
+                            RELIABILITY
+                        </p>
+
+                        <p
+                            class="
+                                text-sm
+                                font-semibold
+                                text-green-400
+                                mt-1
+                            "
+                        >
+                            ${source.reliability}
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        class="
+                            bg-[#081321]
+                            border
+                            border-[#1C3048]
+                            rounded-md
+                            p-3
+                        "
+                    >
+
+                        <p class="text-[8px] text-slate-600">
+                            LAST EVENT
+                        </p>
+
+                        <p
+                            class="
+                                text-[10px]
+                                font-semibold
+                                text-slate-300
+                                mt-2
+                            "
+                        >
+                            ${lastEvent}
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- EVENT TYPES -->
+
+                <div class="mt-5">
+
+                    <p
+                        class="
+                            text-[8px]
+                            text-slate-600
+                            tracking-wider
+                            mb-2
+                        "
+                    >
+                        SIMULATED EVENT TYPES
+                    </p>
+
+                    <div class="flex flex-wrap gap-1.5">
+
+                        ${source.eventTypes
+                            .slice(0, 3)
+                            .map(
+                                type =>
+                                `
+                                <span class="source-event-tag">
+                                    ${type}
+                                </span>
+                                `
+                            )
+                            .join("")}
+
+                        ${
+                            source.eventTypes.length > 3
+                            ?
+                            `
+                            <span class="source-event-tag">
+                                +${source.eventTypes.length - 3}
+                            </span>
+                            `
+                            :
+                            ""
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <!-- FOOTER -->
+
+                <div
+                    class="
+                        mt-5
+                        pt-4
+                        border-t
+                        border-[#1C3048]
+                        flex
+                        justify-between
+                        items-center
+                    "
+                >
+
+                    <span
+                        class="
+                            text-[9px]
+                            text-slate-600
+                        "
+                    >
+                        SIMULATED FEED
+                    </span>
+
+
+                    <button
+                        data-source-id="${source.id}"
+                        class="
+                            source-view-btn
+                            px-3
+                            py-1.5
+                            rounded
+                            border
+                            border-[#1C3048]
+                            text-[9px]
+                            text-slate-400
+                            hover:text-cyan-400
+                            hover:border-cyan-500
+                        "
+                    >
+                        View Details
+                    </button>
+
+                </div>
+
+            `;
+
+
+            grid.appendChild(
+                card
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   SOURCE MODAL
+   ========================================================= */
+
+function openSourceModal(
+    sourceId
+) {
+
+    const source =
+        intelligenceSources.find(
+            item =>
+                item.id === sourceId
+        );
+
+
+    if (!source) {
+        return;
+    }
+
+
+    currentSource =
+        source;
+
+
+    document
+        .getElementById(
+            "sourceModalTitle"
+        )
+        .textContent =
+        source.name;
+
+
+    document
+        .getElementById(
+            "modalSourceStatus"
+        )
+        .textContent =
+        source.status.toUpperCase();
+
+
+    document
+        .getElementById(
+            "modalSourceReliability"
+        )
+        .textContent =
+        source.reliability;
+
+
+    document
+        .getElementById(
+            "modalSourceEvents"
+        )
+        .textContent =
+        Number(
+            source.backendEvents
+            ?? 0
+        ).toLocaleString();
+
+
+    document
+        .getElementById(
+            "modalSourceLastEvent"
+        )
+        .textContent =
+        source.backendLastEvent
+            ? formatTimeAgo(
+                source.backendLastEvent
+            )
+            : "—";
+
+
+    document
+        .getElementById(
+            "modalSourceDescription"
+        )
+        .textContent =
+        source.description;
+
+
+    const eventList =
+        document.getElementById(
+            "modalSourceEventsList"
+        );
+
+
+    eventList.innerHTML =
+        source.eventTypes
+            .map(
+                type =>
+                `
+                <span class="source-event-tag">
+                    ${type}
+                </span>
+                `
+            )
+            .join("");
+
+
+    const modal =
+        document.getElementById(
+            "sourceModal"
+        );
+
+
+    modal.classList.remove(
+        "hidden"
+    );
+
+    modal.classList.add(
+        "flex"
+    );
+
+}
+
+
+/* =========================================================
+   CLOSE MODAL
+   ========================================================= */
+
+function closeSourceModal() {
+
+    const modal =
+        document.getElementById(
+            "sourceModal"
+        );
+
+
+    modal.classList.add(
+        "hidden"
+    );
+
+    modal.classList.remove(
+        "flex"
+    );
+
+}
+
+
+/* =========================================================
+   MODAL CLOSE BUTTON
+   ========================================================= */
+
+document
+    .getElementById(
+        "closeSourceModal"
+    )
+    .addEventListener(
+        "click",
+        closeSourceModal
+    );
+
+
+/* =========================================================
+   MODAL BACKDROP
+   ========================================================= */
+
+document
+    .getElementById(
+        "sourceModal"
+    )
+    .addEventListener(
+        "click",
+        function (event) {
+
+            if (
+                event.target === this
+            ) {
+
+                closeSourceModal();
+
+            }
+
+        }
+    );
+
+
+/* =========================================================
+   CARD BUTTON EVENTS
+   ========================================================= */
+
+document
+    .getElementById(
+        "sourceGrid"
+    )
+    .addEventListener(
+        "click",
+        function (event) {
+
+            const button =
+                event.target.closest(
+                    "[data-source-id]"
+                );
+
+
+            if (!button) {
+                return;
+            }
+
+
+            openSourceModal(
+                button.dataset.sourceId
+            );
+
+        }
+    );
+
+
+/* =========================================================
+   ESCAPE KEY
+   ========================================================= */
+
+document.addEventListener(
+    "keydown",
+    function (event) {
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            closeSourceModal();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   INITIAL LOAD
+   ========================================================= */
+
+loadSourceData();
+
+</script>
+
+{% endblock %}

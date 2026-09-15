@@ -1,0 +1,2420 @@
+```html
+{% extends "base.html" %}
+
+{% block title %}
+ARES — MITRE ATT&CK
+{% endblock %}
+
+{% block page_title %}
+MITRE ATT&CK
+{% endblock %}
+
+
+{% block content %}
+
+
+
+<!-- =========================================================
+     STATISTICS
+     ========================================================= -->
+
+<div
+    class="
+        grid
+        grid-cols-1
+        sm:grid-cols-2
+        lg:grid-cols-4
+        gap-4
+        mb-6
+    "
+>
+
+    <div class="panel rounded-lg p-4">
+
+        <p class="text-[10px] text-slate-500 tracking-wider">
+            TECHNIQUES IDENTIFIED
+        </p>
+
+        <p
+            id="techniquesIdentified"
+            class="text-2xl font-bold text-purple-400 mt-2"
+        >
+            —
+        </p>
+
+        <p class="text-[10px] text-slate-500 mt-2">
+            Backend-generated mappings
+        </p>
+
+    </div>
+
+
+    <div class="panel rounded-lg p-4">
+
+        <p class="text-[10px] text-slate-500 tracking-wider">
+            TACTICS OBSERVED
+        </p>
+
+        <p
+            id="tacticsObserved"
+            class="text-2xl font-bold text-cyan-400 mt-2"
+        >
+            —
+        </p>
+
+        <p class="text-[10px] text-slate-500 mt-2">
+            Observed ATT&CK tactic categories
+        </p>
+
+    </div>
+
+
+    <div class="panel rounded-lg p-4">
+
+        <p class="text-[10px] text-slate-500 tracking-wider">
+            HIGH CONFIDENCE
+        </p>
+
+        <p
+            id="highConfidence"
+            class="text-2xl font-bold text-green-400 mt-2"
+        >
+            —
+        </p>
+
+        <p class="text-[10px] text-slate-500 mt-2">
+            Strong backend mappings
+        </p>
+
+    </div>
+
+
+    <div class="panel rounded-lg p-4">
+
+        <p class="text-[10px] text-slate-500 tracking-wider">
+            MAPPED INVESTIGATIONS
+        </p>
+
+        <p
+            id="mappedInvestigations"
+            class="text-2xl font-bold text-amber-400 mt-2"
+        >
+            —
+        </p>
+
+        <p class="text-[10px] text-slate-500 mt-2">
+            Correlated investigation clusters
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     SEARCH + FILTERS
+     ========================================================= -->
+
+<div class="panel rounded-lg p-4 mb-5">
+
+    <div
+        class="
+            flex
+            flex-col
+            lg:flex-row
+            gap-3
+            lg:items-end
+        "
+    >
+
+        <div class="flex-1">
+
+            <label class="block text-[10px] text-slate-500 mb-2">
+                SEARCH TECHNIQUES
+            </label>
+
+            <input
+                id="mitreSearch"
+                type="text"
+                placeholder="Search technique ID, name or tactic..."
+                class="
+                    w-full
+                    bg-[#081321]
+                    border
+                    border-[#1C3048]
+                    rounded-md
+                    px-4
+                    py-2.5
+                    text-xs
+                    text-slate-200
+                    placeholder-slate-600
+                    outline-none
+                    focus:border-purple-500
+                "
+            >
+
+        </div>
+
+
+        <div class="w-full lg:w-48">
+
+            <label class="block text-[10px] text-slate-500 mb-2">
+                TACTIC
+            </label>
+
+            <select
+                id="tacticFilter"
+                class="filter-control"
+            >
+
+                <option value="all">
+                    All Tactics
+                </option>
+
+                <option value="Reconnaissance">
+                    Reconnaissance
+                </option>
+
+                <option value="Initial Access">
+                    Initial Access
+                </option>
+
+                <option value="Execution">
+                    Execution
+                </option>
+
+                <option value="Persistence">
+                    Persistence
+                </option>
+
+                <option value="Privilege Escalation">
+                    Privilege Escalation
+                </option>
+
+                <option value="Defense Evasion">
+                    Defense Evasion
+                </option>
+
+                <option value="Credential Access">
+                    Credential Access
+                </option>
+
+                <option value="Discovery">
+                    Discovery
+                </option>
+
+                <option value="Command and Control">
+                    Command and Control
+                </option>
+
+                <option value="Exfiltration">
+                    Exfiltration
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="w-full lg:w-44">
+
+            <label class="block text-[10px] text-slate-500 mb-2">
+                CONFIDENCE
+            </label>
+
+            <select
+                id="confidenceFilter"
+                class="filter-control"
+            >
+
+                <option value="all">
+                    All Confidence
+                </option>
+
+                <option value="High">
+                    High
+                </option>
+
+                <option value="Medium">
+                    Medium
+                </option>
+
+                <option value="Low">
+                    Low
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <button
+            id="resetMitreFilters"
+            class="
+                px-4
+                py-2.5
+                rounded-md
+                border
+                border-[#1C3048]
+                text-xs
+                text-slate-400
+                hover:text-purple-400
+                hover:border-purple-500
+            "
+        >
+            Reset
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     TACTIC DISTRIBUTION
+     ========================================================= -->
+
+<div
+    class="
+        grid
+        grid-cols-1
+        xl:grid-cols-3
+        gap-5
+        mb-6
+    "
+>
+
+    <div
+        class="
+            panel
+            rounded-lg
+            p-5
+            xl:col-span-2
+        "
+    >
+
+        <div class="flex justify-between items-center mb-4">
+
+            <div>
+
+                <p class="text-[9px] text-purple-400 tracking-widest">
+                    TACTIC DISTRIBUTION
+                </p>
+
+                <h3 class="text-sm font-semibold text-white mt-1">
+                    ARES ATT&CK Mapping
+                </h3>
+
+            </div>
+
+            <span
+                class="
+                    text-[9px]
+                    px-2
+                    py-1
+                    rounded
+                    border
+                    border-purple-500/20
+                    text-purple-400
+                    bg-purple-500/5
+                "
+            >
+                DEMO DATA
+            </span>
+
+        </div>
+
+
+        <div class="h-[280px]">
+
+            <canvas id="tacticChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+    <!-- COVERAGE SUMMARY -->
+
+    <div class="panel rounded-lg p-5">
+
+        <p class="text-[9px] text-cyan-400 tracking-widest">
+            COVERAGE SUMMARY
+        </p>
+
+        <h3 class="text-sm font-semibold text-white mt-1 mb-5">
+            Observed Technique Distribution
+        </h3>
+
+
+        <div
+            id="coverageSummary"
+            class="space-y-5"
+        >
+
+            <div class="text-xs text-slate-600">
+                Loading backend mappings...
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     TABLE TOOLBAR
+     ========================================================= -->
+
+<div
+    class="
+        flex
+        flex-col
+        sm:flex-row
+        justify-between
+        items-start
+        sm:items-center
+        gap-3
+        mb-4
+    "
+>
+
+    <div>
+
+        <p
+            id="mitreResultCount"
+            class="text-xs text-slate-400"
+        >
+            Loading techniques...
+        </p>
+
+        <p class="text-[10px] text-slate-600 mt-1">
+            Technique mappings are generated from simulated alert
+            correlation results.
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     TECHNIQUE TABLE
+     ========================================================= -->
+
+<div class="panel rounded-lg overflow-hidden">
+
+    <div class="overflow-x-auto">
+
+        <table class="w-full min-w-[1050px]">
+
+            <thead>
+
+                <tr
+                    class="
+                        border-b
+                        border-[#1C3048]
+                        bg-[#081321]
+                    "
+                >
+
+                    <th class="table-heading">
+                        TECHNIQUE
+                    </th>
+
+                    <th class="table-heading">
+                        NAME
+                    </th>
+
+                    <th class="table-heading">
+                        TACTIC
+                    </th>
+
+                    <th class="table-heading">
+                        ALERTS
+                    </th>
+
+                    <th class="table-heading">
+                        INVESTIGATIONS
+                    </th>
+
+                    <th class="table-heading">
+                        CONFIDENCE
+                    </th>
+
+                    <th class="table-heading">
+                        LAST OBSERVED
+                    </th>
+
+                    <th class="table-heading">
+                        ACTION
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody
+                id="mitreTableBody"
+                class="divide-y divide-[#1C3048]"
+            >
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <div
+        id="mitreEmpty"
+        class="hidden py-16 text-center"
+    >
+
+        <div class="text-3xl text-slate-700">
+            ◌
+        </div>
+
+        <p class="text-sm text-slate-400 mt-3">
+            No techniques match the selected filters.
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     TECHNIQUE DETAIL MODAL
+     ========================================================= -->
+
+<div
+    id="techniqueModal"
+    class="
+        fixed
+        inset-0
+        z-50
+        hidden
+        items-center
+        justify-center
+        bg-black/70
+        backdrop-blur-sm
+        p-4
+    "
+>
+
+    <div
+        class="
+            w-full
+            max-w-3xl
+            max-h-[90vh]
+            overflow-y-auto
+            bg-[#09111D]
+            border
+            border-[#1C3048]
+            rounded-xl
+            shadow-2xl
+        "
+    >
+
+        <div
+            class="
+                px-6
+                py-4
+                border-b
+                border-[#1C3048]
+                flex
+                justify-between
+                items-center
+            "
+        >
+
+            <div>
+
+                <p class="text-[9px] text-purple-400 tracking-widest">
+                    MITRE ATT&CK TECHNIQUE
+                </p>
+
+                <h2
+                    id="techniqueModalTitle"
+                    class="text-base font-semibold text-white mt-1"
+                >
+                    Technique
+                </h2>
+
+            </div>
+
+
+            <button
+                id="closeTechniqueModal"
+                class="text-slate-500 hover:text-white text-xl"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="p-6">
+
+            <div
+                class="
+                    grid
+                    grid-cols-1
+                    sm:grid-cols-3
+                    gap-4
+                    mb-6
+                "
+            >
+
+                <div class="modal-info-card">
+
+                    <p class="modal-label">
+                        TECHNIQUE ID
+                    </p>
+
+                    <p
+                        id="modalTechniqueId"
+                        class="modal-value text-purple-400"
+                    >
+                        —
+                    </p>
+
+                </div>
+
+
+                <div class="modal-info-card">
+
+                    <p class="modal-label">
+                        TACTIC
+                    </p>
+
+                    <p
+                        id="modalTechniqueTactic"
+                        class="modal-value"
+                    >
+                        —
+                    </p>
+
+                </div>
+
+
+                <div class="modal-info-card">
+
+                    <p class="modal-label">
+                        CONFIDENCE
+                    </p>
+
+                    <p
+                        id="modalTechniqueConfidence"
+                        class="modal-value"
+                    >
+                        —
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="mb-6">
+
+                <p class="modal-label mb-2">
+                    TECHNIQUE DESCRIPTION
+                </p>
+
+                <div
+                    id="modalTechniqueDescription"
+                    class="
+                        bg-[#081321]
+                        border
+                        border-[#1C3048]
+                        rounded-lg
+                        p-4
+                        text-xs
+                        leading-6
+                        text-slate-300
+                    "
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+                <div
+                    class="
+                        bg-[#081321]
+                        border
+                        border-[#1C3048]
+                        rounded-lg
+                        p-4
+                    "
+                >
+
+                    <p class="modal-label">
+                        CORRELATED ALERTS
+                    </p>
+
+                    <p
+                        id="modalTechniqueAlerts"
+                        class="
+                            text-lg
+                            font-bold
+                            text-cyan-400
+                            mt-2
+                        "
+                    >
+                        —
+                    </p>
+
+                    <p class="text-[9px] text-slate-600 mt-1">
+                        Backend-correlated alerts
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="
+                        bg-[#081321]
+                        border
+                        border-[#1C3048]
+                        rounded-lg
+                        p-4
+                    "
+                >
+
+                    <p class="modal-label">
+                        INVESTIGATIONS
+                    </p>
+
+                    <p
+                        id="modalTechniqueInvestigations"
+                        class="
+                            text-lg
+                            font-bold
+                            text-purple-400
+                            mt-2
+                        "
+                    >
+                        —
+                    </p>
+
+                    <p class="text-[9px] text-slate-600 mt-1">
+                        Correlated investigation clusters
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="
+                    mt-6
+                    p-4
+                    rounded-lg
+                    border
+                    border-amber-500/20
+                    bg-amber-500/5
+                "
+            >
+
+                <p class="text-[10px] text-amber-400 font-semibold">
+                    SIMULATION NOTICE
+                </p>
+
+                <p class="text-[10px] text-slate-500 mt-1">
+                    This mapping is generated from simulated ARES
+                    correlation data. It does not represent a confirmed
+                    real-world ATT&CK technique.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<style>
+
+    .filter-control {
+
+        width: 100%;
+        background: #081321;
+        border: 1px solid #1C3048;
+        border-radius: 6px;
+        padding: 9px 12px;
+        color: #94A3B8;
+        font-size: 10px;
+        outline: none;
+
+    }
+
+    .filter-control:focus {
+        border-color: #A855F7;
+    }
+
+
+    .table-heading {
+
+        padding: 12px;
+        text-align: left;
+        font-size: 9px;
+        font-weight: 600;
+        color: #64748B;
+        letter-spacing: .08em;
+        white-space: nowrap;
+
+    }
+
+
+    .table-cell {
+
+        padding: 13px 12px;
+        font-size: 10px;
+        color: #94A3B8;
+        white-space: nowrap;
+
+    }
+
+
+    .modal-info-card {
+
+        background: #081321;
+        border: 1px solid #1C3048;
+        border-radius: 8px;
+        padding: 14px;
+
+    }
+
+
+    .modal-label {
+
+        font-size: 9px;
+        color: #64748B;
+        letter-spacing: .08em;
+
+    }
+
+
+    .modal-value {
+
+        font-size: 12px;
+        color: #E2E8F0;
+        margin-top: 6px;
+
+    }
+
+</style>
+
+
+<script>
+
+/* =========================================================
+   BACKEND MITRE DATA
+   ========================================================= */
+
+let mitreTechniques = [];
+
+let filteredTechniques = [];
+
+let currentTechnique = null;
+
+let tacticChart = null;
+
+
+/*
+ * Presentation metadata for the techniques that the
+ * ARES backend currently produces.
+ *
+ * Counts, confidence and timestamps come from /api/clusters.
+ */
+const techniqueMetadata = {
+
+    "T1071.001": {
+
+        name: "Web Protocols",
+
+        tactic: "Command and Control",
+
+        description:
+            "Application layer protocols such as HTTP or HTTPS used for command-and-control communication."
+
+    },
+
+
+    "T1059.001": {
+
+        name: "PowerShell",
+
+        tactic: "Execution",
+
+        description:
+            "PowerShell used to execute commands, scripts, or other activity on an endpoint."
+
+    },
+
+
+    "T1110": {
+
+        name: "Brute Force",
+
+        tactic: "Credential Access",
+
+        description:
+            "Repeated authentication attempts intended to obtain access through password or credential guessing."
+
+    },
+
+
+    "T1547": {
+
+        name: "Boot or Logon Autostart Execution",
+
+        tactic: "Persistence",
+
+        description:
+            "Mechanisms that cause programs or commands to execute automatically during system boot or user logon."
+
+    },
+
+
+    "T1595": {
+
+        name: "Active Scanning",
+
+        tactic: "Reconnaissance",
+
+        description:
+            "Active probing of systems, services, or infrastructure to identify accessible targets."
+
+    }
+
+};
+
+
+/* =========================================================
+   ELEMENTS
+   ========================================================= */
+
+const mitreSearch =
+    document.getElementById(
+        "mitreSearch"
+    );
+
+const tacticFilter =
+    document.getElementById(
+        "tacticFilter"
+    );
+
+const confidenceFilter =
+    document.getElementById(
+        "confidenceFilter"
+    );
+
+const mitreTableBody =
+    document.getElementById(
+        "mitreTableBody"
+    );
+
+const mitreEmpty =
+    document.getElementById(
+        "mitreEmpty"
+    );
+
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+function escHtml(value) {
+
+    return String(value ?? "")
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+function confidenceLabel(value) {
+
+    const confidence =
+        Number(value ?? 0);
+
+
+    if (confidence >= 0.80) {
+
+        return "High";
+
+    }
+
+
+    if (confidence >= 0.60) {
+
+        return "Medium";
+
+    }
+
+
+    return "Low";
+
+}
+
+
+function formatConfidence(value) {
+
+    const confidence =
+        Number(value ?? 0);
+
+
+    return `${Math.round(
+        confidence * 100
+    )}%`;
+
+}
+
+
+function formatLastObserved(timestamp) {
+
+    if (!timestamp) {
+
+        return "—";
+
+    }
+
+
+    const date =
+        new Date(timestamp);
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return "—";
+
+    }
+
+
+    const diffMs =
+        Date.now() -
+        date.getTime();
+
+
+    const minutes =
+        Math.max(
+            0,
+            Math.floor(
+                diffMs / 60000
+            )
+        );
+
+
+    if (minutes < 1) {
+
+        return "Just now";
+
+    }
+
+
+    if (minutes < 60) {
+
+        return `${minutes} min ago`;
+
+    }
+
+
+    const hours =
+        Math.floor(
+            minutes / 60
+        );
+
+
+    if (hours < 24) {
+
+        return `${hours} hr ago`;
+
+    }
+
+
+    const days =
+        Math.floor(
+            hours / 24
+        );
+
+
+    return `${days} day${
+        days === 1 ? "" : "s"
+    } ago`;
+
+}
+
+
+/* =========================================================
+   LOAD BACKEND DATA
+   ========================================================= */
+
+async function loadMitreData() {
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/clusters"
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `HTTP ${response.status}`
+            );
+
+        }
+
+
+        const clusters =
+            await response.json();
+
+
+        /*
+         * /api/clusters returns the correlated
+         * investigation clusters.
+         */
+        if (
+            !Array.isArray(
+                clusters
+            )
+        ) {
+
+            throw new Error(
+                "Invalid cluster response"
+            );
+
+        }
+
+
+        const techniqueMap =
+            new Map();
+
+
+        clusters.forEach(
+            function (cluster) {
+
+                const alerts =
+                    Array.isArray(
+                        cluster.alerts
+                    )
+                        ? cluster.alerts
+                        : [];
+
+
+                const clusterId =
+                    cluster.cluster_id;
+
+
+                const observedAt =
+                    alerts.reduce(
+                        function (
+                            latest,
+                            alert
+                        ) {
+
+                            if (
+                                !alert.timestamp
+                            ) {
+
+                                return latest;
+
+                            }
+
+
+                            if (
+                                !latest ||
+                                alert.timestamp >
+                                latest
+                            ) {
+
+                                return alert.timestamp;
+
+                            }
+
+
+                            return latest;
+
+                        },
+                        null
+                    );
+
+
+                const techniques =
+                    Array.isArray(
+                        cluster.attack_techniques
+                    )
+                        ? cluster.attack_techniques
+                        : [];
+
+
+                techniques.forEach(
+                    function (
+                        technique
+                    ) {
+
+                        const id =
+                            technique.technique_id;
+
+
+                        if (!id) {
+
+                            return;
+
+                        }
+
+
+                        const metadata =
+                            techniqueMetadata[id]
+                            || {};
+
+
+                        if (
+                            !techniqueMap.has(
+                                id
+                            )
+                        ) {
+
+                            techniqueMap.set(
+                                id,
+                                {
+
+                                    id: id,
+
+                                    name:
+                                        metadata.name
+                                        ||
+                                        technique.technique_name
+                                        ||
+                                        id,
+
+                                    tactic:
+                                        metadata.tactic
+                                        ||
+                                        "Unclassified",
+
+                                    alerts:
+                                        0,
+
+                                    investigationIds:
+                                        new Set(),
+
+                                    alertIds:
+                                        new Set(),
+
+                                    confidence:
+                                        0,
+
+                                    lastObserved:
+                                        null,
+
+                                    description:
+                                        metadata.description
+                                        ||
+                                        "Technique mapping generated from simulated ARES correlation results."
+
+                                }
+                            );
+
+                        }
+
+
+                        const item =
+                            techniqueMap.get(
+                                id
+                            );
+
+
+                        /*
+                         * Count unique alerts rather than
+                         * multiplying counts across mappings.
+                         */
+                        alerts.forEach(
+                            function (
+                                alert
+                            ) {
+
+                                if (
+                                    alert.alert_id
+                                ) {
+
+                                    item.alertIds.add(
+                                        alert.alert_id
+                                    );
+
+                                }
+
+                            }
+                        );
+
+
+                        /*
+                         * Keep a unique investigation /
+                         * cluster reference.
+                         */
+                        if (clusterId) {
+
+                            item.investigationIds.add(
+                                clusterId
+                            );
+
+                        }
+
+
+                        const confidence =
+                            Number(
+                                technique.confidence
+                                || 0
+                            );
+
+
+                        item.confidence =
+                            Math.max(
+                                item.confidence,
+                                confidence
+                            );
+
+
+                        if (
+                            observedAt &&
+                            (
+                                !item.lastObserved
+                                ||
+                                observedAt >
+                                item.lastObserved
+                            )
+                        ) {
+
+                            item.lastObserved =
+                                observedAt;
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+
+        mitreTechniques =
+            Array.from(
+                techniqueMap.values()
+            ).map(
+                function (
+                    technique
+                ) {
+
+                    return {
+
+                        id:
+                            technique.id,
+
+                        name:
+                            technique.name,
+
+                        tactic:
+                            technique.tactic,
+
+                        alerts:
+                            technique.alertIds.size,
+
+                        investigations:
+                            technique.investigationIds.size,
+
+                        confidence:
+                            confidenceLabel(
+                                technique.confidence
+                            ),
+
+                        confidencePercent:
+                            formatConfidence(
+                                technique.confidence
+                            ),
+
+                        lastObserved:
+                            formatLastObserved(
+                                technique.lastObserved
+                            ),
+
+                        description:
+                            technique.description
+
+                    };
+
+                }
+            );
+
+
+        /*
+         * Most observed techniques first.
+         */
+        mitreTechniques.sort(
+            function (
+                a,
+                b
+            ) {
+
+                if (
+                    b.alerts !==
+                    a.alerts
+                ) {
+
+                    return (
+                        b.alerts -
+                        a.alerts
+                    );
+
+                }
+
+
+                return a.id.localeCompare(
+                    b.id
+                );
+
+            }
+        );
+
+
+        filteredTechniques =
+            [
+                ...mitreTechniques
+            ];
+
+
+        updateStatistics(
+            clusters
+        );
+
+        updateTacticChart();
+
+        updateCoverageSummary();
+
+        renderMitreTable();
+
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load MITRE data:",
+            error
+        );
+
+
+        mitreTechniques = [];
+
+        filteredTechniques = [];
+
+
+        updateStatistics(
+            []
+        );
+
+        updateTacticChart();
+
+        updateCoverageSummary();
+
+        renderMitreTable();
+
+    }
+
+}
+
+
+/* =========================================================
+   STATISTICS
+   ========================================================= */
+
+function updateStatistics(
+    clusters
+) {
+
+    const techniqueCount =
+        mitreTechniques.length;
+
+
+    const tactics =
+        new Set(
+            mitreTechniques.map(
+                function (
+                    technique
+                ) {
+
+                    return technique.tactic;
+
+                }
+            )
+        );
+
+
+    const highConfidence =
+        mitreTechniques.filter(
+            function (
+                technique
+            ) {
+
+                return (
+                    technique.confidence ===
+                    "High"
+                );
+
+            }
+        ).length;
+
+
+    const investigationCount =
+        Array.isArray(
+            clusters
+        )
+            ? clusters.length
+            : 0;
+
+
+    document
+        .getElementById(
+            "techniquesIdentified"
+        )
+        .textContent =
+        techniqueCount;
+
+
+    document
+        .getElementById(
+            "tacticsObserved"
+        )
+        .textContent =
+        tactics.size;
+
+
+    document
+        .getElementById(
+            "highConfidence"
+        )
+        .textContent =
+        highConfidence;
+
+
+    document
+        .getElementById(
+            "mappedInvestigations"
+        )
+        .textContent =
+        investigationCount;
+
+}
+
+
+/* =========================================================
+   CONFIDENCE BADGE
+   ========================================================= */
+
+function confidenceBadge(
+    confidence
+) {
+
+    const classes = {
+
+        High:
+            "bg-green-500/10 text-green-400 border-green-500/20",
+
+        Medium:
+            "bg-amber-500/10 text-amber-400 border-amber-500/20",
+
+        Low:
+            "bg-slate-500/10 text-slate-400 border-slate-500/20"
+
+    };
+
+
+    return `
+        <span
+            class="
+                inline-flex
+                px-2
+                py-1
+                rounded
+                border
+                ${
+                    classes[confidence]
+                    ||
+                    classes.Low
+                }
+                text-[9px]
+            "
+        >
+            ${escHtml(confidence)}
+        </span>
+    `;
+
+}
+
+
+/* =========================================================
+   RENDER TABLE
+   ========================================================= */
+
+function renderMitreTable() {
+
+    mitreTableBody.innerHTML = "";
+
+
+    if (
+        filteredTechniques.length === 0
+    ) {
+
+        mitreEmpty.classList.remove(
+            "hidden"
+        );
+
+    } else {
+
+        mitreEmpty.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    filteredTechniques.forEach(
+        function (
+            technique
+        ) {
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            row.className =
+                "hover:bg-[#0C1928] transition";
+
+
+            row.innerHTML = `
+
+                <td class="table-cell">
+
+                    <span
+                        class="
+                            text-purple-400
+                            font-semibold
+                        "
+                    >
+                        ${escHtml(
+                            technique.id
+                        )}
+                    </span>
+
+                </td>
+
+
+                <td class="table-cell">
+
+                    <span class="text-slate-200">
+                        ${escHtml(
+                            technique.name
+                        )}
+                    </span>
+
+                </td>
+
+
+                <td class="table-cell">
+
+                    <span
+                        class="
+                            px-2
+                            py-1
+                            rounded
+                            bg-cyan-500/5
+                            border
+                            border-cyan-500/10
+                            text-cyan-400
+                            text-[9px]
+                        "
+                    >
+                        ${escHtml(
+                            technique.tactic
+                        )}
+                    </span>
+
+                </td>
+
+
+                <td class="table-cell">
+                    ${technique.alerts}
+                </td>
+
+
+                <td class="table-cell">
+
+                    <span class="text-purple-400">
+                        ${technique.investigations}
+                    </span>
+
+                </td>
+
+
+                <td class="table-cell">
+
+                    ${confidenceBadge(
+                        technique.confidence
+                    )}
+
+                    <span
+                        class="
+                            ml-1
+                            text-slate-600
+                        "
+                    >
+                        ${escHtml(
+                            technique.confidencePercent
+                        )}
+                    </span>
+
+                </td>
+
+
+                <td class="table-cell">
+                    ${escHtml(
+                        technique.lastObserved
+                    )}
+                </td>
+
+
+                <td class="table-cell">
+
+                    <button
+                        data-technique-id="${escHtml(
+                            technique.id
+                        )}"
+                        class="
+                            px-2.5
+                            py-1.5
+                            rounded
+                            border
+                            border-[#1C3048]
+                            text-[9px]
+                            text-slate-400
+                            hover:text-purple-400
+                            hover:border-purple-500
+                        "
+                    >
+                        View
+                    </button>
+
+                </td>
+
+            `;
+
+
+            mitreTableBody.appendChild(
+                row
+            );
+
+        }
+    );
+
+
+    document
+        .getElementById(
+            "mitreResultCount"
+        )
+        .textContent =
+        `Showing ${
+            filteredTechniques.length
+        } backend-generated technique${
+            filteredTechniques.length === 1
+                ? ""
+                : "s"
+        }`;
+
+}
+
+
+/* =========================================================
+   FILTER
+   ========================================================= */
+
+function applyMitreFilters() {
+
+    const search =
+        mitreSearch.value
+            .trim()
+            .toLowerCase();
+
+
+    const tactic =
+        tacticFilter.value;
+
+
+    const confidence =
+        confidenceFilter.value;
+
+
+    filteredTechniques =
+        mitreTechniques.filter(
+            function (
+                technique
+            ) {
+
+                const searchable = [
+
+                    technique.id,
+
+                    technique.name,
+
+                    technique.tactic,
+
+                    technique.description
+
+                ]
+                    .join(" ")
+                    .toLowerCase();
+
+
+                const matchesSearch =
+                    !search ||
+                    searchable.includes(
+                        search
+                    );
+
+
+                const matchesTactic =
+                    tactic === "all" ||
+                    technique.tactic ===
+                    tactic;
+
+
+                const matchesConfidence =
+                    confidence === "all" ||
+                    technique.confidence ===
+                    confidence;
+
+
+                return (
+                    matchesSearch &&
+                    matchesTactic &&
+                    matchesConfidence
+                );
+
+            }
+        );
+
+
+    renderMitreTable();
+
+}
+
+
+/* =========================================================
+   FILTER EVENTS
+   ========================================================= */
+
+mitreSearch.addEventListener(
+    "input",
+    applyMitreFilters
+);
+
+
+tacticFilter.addEventListener(
+    "change",
+    applyMitreFilters
+);
+
+
+confidenceFilter.addEventListener(
+    "change",
+    applyMitreFilters
+);
+
+
+document
+    .getElementById(
+        "resetMitreFilters"
+    )
+    .addEventListener(
+        "click",
+        function () {
+
+            mitreSearch.value = "";
+
+            tacticFilter.value =
+                "all";
+
+            confidenceFilter.value =
+                "all";
+
+            applyMitreFilters();
+
+        }
+    );
+
+
+/* =========================================================
+   TECHNIQUE MODAL
+   ========================================================= */
+
+mitreTableBody.addEventListener(
+    "click",
+    function (
+        event
+    ) {
+
+        const button =
+            event.target.closest(
+                "[data-technique-id]"
+            );
+
+
+        if (!button) {
+
+            return;
+
+        }
+
+
+        openTechnique(
+            button.dataset.techniqueId
+        );
+
+    }
+);
+
+
+function openTechnique(
+    id
+) {
+
+    const technique =
+        mitreTechniques.find(
+            function (
+                item
+            ) {
+
+                return item.id === id;
+
+            }
+        );
+
+
+    if (!technique) {
+
+        return;
+
+    }
+
+
+    currentTechnique =
+        technique;
+
+
+    document
+        .getElementById(
+            "techniqueModalTitle"
+        )
+        .textContent =
+        technique.name;
+
+
+    document
+        .getElementById(
+            "modalTechniqueId"
+        )
+        .textContent =
+        technique.id;
+
+
+    document
+        .getElementById(
+            "modalTechniqueTactic"
+        )
+        .textContent =
+        technique.tactic;
+
+
+    document
+        .getElementById(
+            "modalTechniqueConfidence"
+        )
+        .textContent =
+        technique.confidencePercent;
+
+
+    document
+        .getElementById(
+            "modalTechniqueDescription"
+        )
+        .textContent =
+        technique.description;
+
+
+    document
+        .getElementById(
+            "modalTechniqueAlerts"
+        )
+        .textContent =
+        technique.alerts;
+
+
+    document
+        .getElementById(
+            "modalTechniqueInvestigations"
+        )
+        .textContent =
+        technique.investigations;
+
+
+    const modal =
+        document.getElementById(
+            "techniqueModal"
+        );
+
+
+    modal.classList.remove(
+        "hidden"
+    );
+
+
+    modal.classList.add(
+        "flex"
+    );
+
+}
+
+
+function closeTechnique() {
+
+    const modal =
+        document.getElementById(
+            "techniqueModal"
+        );
+
+
+    modal.classList.add(
+        "hidden"
+    );
+
+
+    modal.classList.remove(
+        "flex"
+    );
+
+}
+
+
+document
+    .getElementById(
+        "closeTechniqueModal"
+    )
+    .addEventListener(
+        "click",
+        closeTechnique
+    );
+
+
+document
+    .getElementById(
+        "techniqueModal"
+    )
+    .addEventListener(
+        "click",
+        function (
+            event
+        ) {
+
+            if (
+                event.target === this
+            ) {
+
+                closeTechnique();
+
+            }
+
+        }
+    );
+
+
+/* =========================================================
+   TACTIC CHART
+   ========================================================= */
+
+function updateTacticChart() {
+
+    const canvas =
+        document.getElementById(
+            "tacticChart"
+        );
+
+
+    if (!canvas) {
+
+        return;
+
+    }
+
+
+    const tacticCounts = {};
+
+
+    mitreTechniques.forEach(
+        function (
+            technique
+        ) {
+
+            const tactic =
+                technique.tactic;
+
+
+            tacticCounts[tactic] =
+                (
+                    tacticCounts[tactic]
+                    || 0
+                ) + 1;
+
+        }
+    );
+
+
+    const labels =
+        Object.keys(
+            tacticCounts
+        );
+
+
+    const values =
+        labels.map(
+            function (
+                label
+            ) {
+
+                return tacticCounts[
+                    label
+                ];
+
+            }
+        );
+
+
+    if (tacticChart) {
+
+        tacticChart.destroy();
+
+    }
+
+
+    tacticChart =
+        new Chart(
+            canvas.getContext(
+                "2d"
+            ),
+            {
+
+                type: "bar",
+
+                data: {
+
+                    labels: labels,
+
+                    datasets: [
+
+                        {
+
+                            label:
+                                "Mapped Techniques",
+
+                            data: values,
+
+                            borderWidth: 1,
+
+                            borderRadius: 4
+
+                        }
+
+                    ]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+
+                        legend: {
+
+                            display: false
+
+                        }
+
+                    },
+
+                    scales: {
+
+                        x: {
+
+                            ticks: {
+
+                                color:
+                                    "#64748B",
+
+                                font: {
+
+                                    size: 9
+
+                                }
+
+                            },
+
+                            grid: {
+
+                                display: false
+
+                            }
+
+                        },
+
+                        y: {
+
+                            beginAtZero: true,
+
+                            ticks: {
+
+                                color:
+                                    "#64748B",
+
+                                font: {
+
+                                    size: 9
+
+                                },
+
+                                stepSize: 1
+
+                            },
+
+                            grid: {
+
+                                color:
+                                    "#16263A"
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+}
+
+
+/* =========================================================
+   COVERAGE SUMMARY
+   ========================================================= */
+
+function updateCoverageSummary() {
+
+    const container =
+        document.getElementById(
+            "coverageSummary"
+        );
+
+
+    if (!container) {
+
+        return;
+
+    }
+
+
+    if (
+        mitreTechniques.length === 0
+    ) {
+
+        container.innerHTML = `
+
+            <div class="text-xs text-slate-600">
+                No backend-generated technique mappings available.
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    const tacticCounts = {};
+
+
+    mitreTechniques.forEach(
+        function (
+            technique
+        ) {
+
+            const tactic =
+                technique.tactic;
+
+
+            tacticCounts[tactic] =
+                (
+                    tacticCounts[tactic]
+                    || 0
+                ) + 1;
+
+        }
+    );
+
+
+    const entries =
+        Object.entries(
+            tacticCounts
+        );
+
+
+    const total =
+        mitreTechniques.length;
+
+
+    container.innerHTML =
+        entries
+            .map(
+                function (
+                    entry
+                ) {
+
+                    const tactic =
+                        entry[0];
+
+                    const count =
+                        entry[1];
+
+
+                    const percentage =
+                        Math.round(
+                            (
+                                count /
+                                total
+                            ) * 100
+                        );
+
+
+                    return `
+
+                        <div>
+
+                            <div class="flex justify-between mb-2">
+
+                                <span class="text-[10px] text-slate-400">
+                                    ${escHtml(
+                                        tactic
+                                    )}
+                                </span>
+
+                                <span class="text-[10px] text-slate-300">
+                                    ${count} technique${count === 1 ? "" : "s"}
+                                </span>
+
+                            </div>
+
+                            <div class="h-1.5 bg-[#122033] rounded-full">
+
+                                <div
+                                    class="
+                                        h-full
+                                        bg-purple-500
+                                        rounded-full
+                                    "
+                                    style="width: ${percentage}%"
+                                ></div>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+}
+
+
+/* =========================================================
+   ESC KEY
+   ========================================================= */
+
+document.addEventListener(
+    "keydown",
+    function (
+        event
+    ) {
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            closeTechnique();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   INITIAL LOAD
+   ========================================================= */
+
+loadMitreData();
+
+</script>
+
+{% endblock %}
+```

@@ -1,0 +1,968 @@
+{% extends "base.html" %}
+
+{% block title %}BLUF Report Detail | ARES{% endblock %}
+
+{% block page_title %}
+BLUF Report Detail
+{% endblock %}
+
+{% block breadcrumb %}
+<span>ARES</span>
+<span class="text-slate-700">/</span>
+<span>BLUF Reports</span>
+<span class="text-slate-700">/</span>
+<span class="text-slate-300">BLUF-2026-0042</span>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="space-y-6">
+
+    <!-- ========================================================= -->
+    <!-- DEMO NOTICE -->
+    <!-- ========================================================= -->
+
+    <div class="flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-500/5 p-4">
+
+        <svg class="mt-0.5 h-5 w-5 shrink-0 text-amber-400"
+             fill="none"
+             stroke="currentColor"
+             viewBox="0 0 24 24">
+
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.5"
+                  d="M12 9v2m0 4h.01M10.29 3.86l-7.82 13.5A2 2 0 004.2 20h15.6a2 2 0 001.73-2.64l-7.82-13.5a2 2 0 00-3.42 0z"/>
+
+        </svg>
+
+        <div>
+
+            <div class="text-xs font-semibold uppercase tracking-wider text-amber-300">
+                Demo Environment
+            </div>
+
+            <p class="mt-1 text-xs text-slate-400">
+                All data shown is simulated. No real-time intelligence,
+                SIEM, network, or defence-system connectivity.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- HEADER -->
+    <!-- ========================================================= -->
+
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+
+        <div>
+
+            <div class="mb-2 flex flex-wrap items-center gap-2">
+
+                <span class="font-mono text-xs text-cyan-400">
+                    BLUF-2026-0042
+                </span>
+
+                <span class="badge badge-red">
+                    CRITICAL
+                </span>
+
+                <span class="badge badge-blue">
+                    PUBLISHED
+                </span>
+
+            </div>
+
+            <h1 class="text-2xl font-semibold text-slate-100">
+                Suspected Credential Compromise Activity
+            </h1>
+
+            <p class="mt-2 text-sm text-slate-500">
+                Commander-ready Bottom Line Up Front intelligence summary.
+            </p>
+
+        </div>
+
+
+        <!-- ACTIONS -->
+
+        <div class="flex flex-wrap items-center gap-2">
+
+            <button
+                onclick="printReport()"
+                class="rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-xs text-slate-300 hover:text-cyan-400">
+
+                Print
+
+            </button>
+
+
+            <button
+                onclick="exportPDF()"
+                class="rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-xs text-slate-300 hover:text-cyan-400">
+
+                Export PDF
+
+            </button>
+
+
+            <button
+                onclick="markReviewed()"
+                class="rounded-md bg-cyan-500 px-3 py-2 text-xs font-semibold text-slate-950 hover:bg-cyan-400">
+
+                Mark Reviewed
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- REPORT METADATA -->
+    <!-- ========================================================= -->
+
+    <div class="grid grid-cols-2 gap-4 md:grid-cols-4 xl:grid-cols-6">
+
+
+        <!-- Risk -->
+
+        <div class="panel p-4">
+
+            <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                Risk Score
+            </div>
+
+            <div class="mt-2 text-2xl font-bold text-red-400">
+                91
+            </div>
+
+        </div>
+
+
+        <!-- Investigation -->
+
+        <div class="panel p-4">
+
+            <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                Investigation
+            </div>
+
+            <div class="mt-3 font-mono text-xs text-cyan-400">
+                IR-2026-0042
+            </div>
+
+        </div>
+
+
+        <!-- Evidence -->
+
+        <div class="panel p-4">
+
+            <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                Evidence
+            </div>
+
+            <div class="mt-2 text-2xl font-bold text-slate-100">
+                4
+            </div>
+
+        </div>
+
+
+        <!-- MITRE -->
+
+        <div class="panel p-4">
+
+            <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                MITRE Mapping
+            </div>
+
+            <div class="mt-2 text-2xl font-bold text-cyan-400">
+                3
+            </div>
+
+        </div>
+
+
+        <!-- Analyst -->
+
+        <div class="panel p-4">
+
+            <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                Analyst
+            </div>
+
+            <div class="mt-3 text-sm font-semibold text-slate-200">
+                Alex Rao
+            </div>
+
+        </div>
+
+
+        <!-- Generated -->
+
+        <div class="panel p-4">
+
+            <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                Generated
+            </div>
+
+            <div class="mt-3 text-xs text-slate-300">
+                13 Sep 2026, 14:42
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- MAIN REPORT -->
+    <!-- ========================================================= -->
+
+    <div id="blufReportContent"
+         class="grid grid-cols-1 gap-4 xl:grid-cols-3">
+
+
+        <!-- ===================================================== -->
+        <!-- LEFT COLUMN -->
+        <!-- ===================================================== -->
+
+        <div class="space-y-4 xl:col-span-2">
+
+
+            <!-- ================================================= -->
+            <!-- BLUF -->
+            <!-- ================================================= -->
+
+            <section class="panel border-l-2 border-l-red-500">
+
+                <div class="border-b border-slate-800 px-5 py-4">
+
+                    <div class="flex items-center gap-2">
+
+                        <span class="flex h-7 w-7 items-center justify-center rounded-md bg-red-500/10 text-red-400">
+
+                            <svg class="h-4 w-4"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+
+                                <path stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      stroke-width="1.5"
+                                      d="M12 9v2m0 4h.01M10.29 3.86l-7.82 13.5A2 2 0 004.2 20h15.6a2 2 0 001.73-2.64l-7.82-13.5a2 2 0 00-3.42 0z"/>
+
+                            </svg>
+
+                        </span>
+
+                        <h2 class="text-sm font-semibold text-slate-100">
+                            Bottom Line Up Front
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="p-5">
+
+                    <p class="text-sm leading-7 text-slate-200">
+
+                        Simulated analysis indicates a high-confidence security
+                        incident involving suspicious endpoint activity,
+                        authentication anomalies, and possible credential-access
+                        behaviour. The correlated evidence produces a high
+                        simulated risk score and warrants analyst review and
+                        containment consideration.
+
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- THREAT OVERVIEW -->
+            <!-- ================================================= -->
+
+            <section class="panel">
+
+                <div class="border-b border-slate-800 px-5 py-4">
+
+                    <h2 class="text-sm font-semibold text-slate-100">
+                        Threat Overview
+                    </h2>
+
+                </div>
+
+
+                <div class="p-5">
+
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+
+
+                        <div class="rounded-md border border-slate-800 bg-slate-950/40 p-4">
+
+                            <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                                Threat Type
+                            </div>
+
+                            <div class="mt-2 text-sm text-slate-200">
+                                Suspected Credential Compromise
+                            </div>
+
+                        </div>
+
+
+                        <div class="rounded-md border border-slate-800 bg-slate-950/40 p-4">
+
+                            <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                                Confidence
+                            </div>
+
+                            <div class="mt-2 text-sm font-semibold text-green-400">
+                                High
+                            </div>
+
+                        </div>
+
+
+                        <div class="rounded-md border border-slate-800 bg-slate-950/40 p-4">
+
+                            <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                                Affected Assets
+                            </div>
+
+                            <div class="mt-2 text-sm text-slate-200">
+                                4 simulated endpoints
+                            </div>
+
+                        </div>
+
+
+                        <div class="rounded-md border border-slate-800 bg-slate-950/40 p-4">
+
+                            <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                                Severity
+                            </div>
+
+                            <div class="mt-2 text-sm font-semibold text-red-400">
+                                Critical
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- SUPPORTING EVIDENCE -->
+            <!-- ================================================= -->
+
+            <section class="panel">
+
+                <div class="border-b border-slate-800 px-5 py-4">
+
+                    <h2 class="text-sm font-semibold text-slate-100">
+                        Supporting Evidence
+                    </h2>
+
+                    <p class="mt-1 text-xs text-slate-500">
+                        Key simulated evidence contributing to the assessment.
+                    </p>
+
+                </div>
+
+
+                <div class="space-y-3 p-5">
+
+
+                    <div class="flex gap-3 rounded-md border border-slate-800 p-3">
+
+                        <div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-red-500/10 text-[10px] text-red-400">
+                            01
+                        </div>
+
+                        <div>
+
+                            <div class="text-xs font-semibold text-slate-200">
+                                Suspicious PowerShell execution
+                            </div>
+
+                            <p class="mt-1 text-xs text-slate-500">
+                                Simulated endpoint telemetry indicates abnormal
+                                PowerShell activity.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="flex gap-3 rounded-md border border-slate-800 p-3">
+
+                        <div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-500/10 text-[10px] text-amber-400">
+                            02
+                        </div>
+
+                        <div>
+
+                            <div class="text-xs font-semibold text-slate-200">
+                                Authentication anomalies
+                            </div>
+
+                            <p class="mt-1 text-xs text-slate-500">
+                                Multiple simulated failed authentication
+                                attempts preceded successful access.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="flex gap-3 rounded-md border border-slate-800 p-3">
+
+                        <div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-[10px] text-cyan-400">
+                            03
+                        </div>
+
+                        <div>
+
+                            <div class="text-xs font-semibold text-slate-200">
+                                Network anomaly
+                            </div>
+
+                            <p class="mt-1 text-xs text-slate-500">
+                                Simulated outbound communication deviates
+                                from the expected baseline.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="flex gap-3 rounded-md border border-slate-800 p-3">
+
+                        <div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-500/10 text-[10px] text-blue-400">
+                            04
+                        </div>
+
+                        <div>
+
+                            <div class="text-xs font-semibold text-slate-200">
+                                Credential-access indicators
+                            </div>
+
+                            <p class="mt-1 text-xs text-slate-500">
+                                Simulated telemetry contains indicators
+                                associated with possible credential dumping.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- MITRE ATT&CK -->
+            <!-- ================================================= -->
+
+            <section class="panel">
+
+                <div class="border-b border-slate-800 px-5 py-4">
+
+                    <h2 class="text-sm font-semibold text-slate-100">
+                        MITRE ATT&amp;CK Mapping
+                    </h2>
+
+                    <p class="mt-1 text-xs text-slate-500">
+                        Simulated ATT&amp;CK mapping for demonstration purposes.
+                    </p>
+
+                </div>
+
+
+                <div class="overflow-x-auto">
+
+                    <table class="w-full">
+
+                        <thead class="bg-slate-950/60">
+
+                            <tr class="text-[10px] uppercase tracking-wider text-slate-500">
+
+                                <th class="px-5 py-3 text-left">
+                                    Technique
+                                </th>
+
+                                <th class="px-5 py-3 text-left">
+                                    Name
+                                </th>
+
+                                <th class="px-5 py-3 text-left">
+                                    Tactic
+                                </th>
+
+                                <th class="px-5 py-3 text-left">
+                                    Confidence
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody class="divide-y divide-slate-800">
+
+
+                            <tr class="hover:bg-slate-900/50">
+
+                                <td class="px-5 py-3 font-mono text-xs text-cyan-400">
+                                    T1059.001
+                                </td>
+
+                                <td class="px-5 py-3 text-xs text-slate-300">
+                                    PowerShell
+                                </td>
+
+                                <td class="px-5 py-3 text-xs text-slate-500">
+                                    Execution
+                                </td>
+
+                                <td class="px-5 py-3 text-xs text-green-400">
+                                    91%
+                                </td>
+
+                            </tr>
+
+
+                            <tr class="hover:bg-slate-900/50">
+
+                                <td class="px-5 py-3 font-mono text-xs text-cyan-400">
+                                    T1003
+                                </td>
+
+                                <td class="px-5 py-3 text-xs text-slate-300">
+                                    OS Credential Dumping
+                                </td>
+
+                                <td class="px-5 py-3 text-xs text-slate-500">
+                                    Credential Access
+                                </td>
+
+                                <td class="px-5 py-3 text-xs text-green-400">
+                                    87%
+                                </td>
+
+                            </tr>
+
+
+                            <tr class="hover:bg-slate-900/50">
+
+                                <td class="px-5 py-3 font-mono text-xs text-cyan-400">
+                                    T1071.001
+                                </td>
+
+                                <td class="px-5 py-3 text-xs text-slate-300">
+                                    Web Protocols
+                                </td>
+
+                                <td class="px-5 py-3 text-xs text-slate-500">
+                                    Command and Control
+                                </td>
+
+                                <td class="px-5 py-3 text-xs text-amber-400">
+                                    76%
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </div>
+
+
+        <!-- ===================================================== -->
+        <!-- RIGHT COLUMN -->
+        <!-- ===================================================== -->
+
+        <div class="space-y-4">
+
+
+            <!-- ================================================= -->
+            <!-- RISK ASSESSMENT -->
+            <!-- ================================================= -->
+
+            <div class="panel">
+
+                <div class="border-b border-slate-800 px-5 py-4">
+
+                    <h2 class="text-sm font-semibold text-slate-100">
+                        Risk Assessment
+                    </h2>
+
+                </div>
+
+
+                <div class="p-5">
+
+                    <div class="flex items-end justify-between">
+
+                        <div>
+
+                            <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                                Overall Risk
+                            </div>
+
+                            <div class="mt-1 text-4xl font-bold text-red-400">
+                                91
+                            </div>
+
+                        </div>
+
+
+                        <span class="badge badge-red">
+                            HIGH RISK
+                        </span>
+
+                    </div>
+
+
+                    <div class="mt-5 h-2 overflow-hidden rounded-full bg-slate-800">
+
+                        <div
+                            class="h-full w-[91%] rounded-full bg-red-500">
+                        </div>
+
+                    </div>
+
+
+                    <p class="mt-3 text-xs text-slate-500">
+                        Risk score is calculated from simulated severity,
+                        correlation confidence, asset criticality and threat
+                        indicators.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- RECOMMENDED ACTIONS -->
+            <!-- ================================================= -->
+
+            <div class="panel">
+
+                <div class="border-b border-slate-800 px-5 py-4">
+
+                    <h2 class="text-sm font-semibold text-slate-100">
+                        Recommended Actions
+                    </h2>
+
+                </div>
+
+
+                <div class="space-y-4 p-5">
+
+
+                    <div class="flex gap-3">
+
+                        <span class="text-xs font-bold text-red-400">
+                            01
+                        </span>
+
+                        <p class="text-xs text-slate-400">
+                            Isolate affected endpoints and validate the activity.
+                        </p>
+
+                    </div>
+
+
+                    <div class="flex gap-3">
+
+                        <span class="text-xs font-bold text-amber-400">
+                            02
+                        </span>
+
+                        <p class="text-xs text-slate-400">
+                            Review authentication activity for potentially
+                            compromised accounts.
+                        </p>
+
+                    </div>
+
+
+                    <div class="flex gap-3">
+
+                        <span class="text-xs font-bold text-cyan-400">
+                            03
+                        </span>
+
+                        <p class="text-xs text-slate-400">
+                            Investigate outbound communication associated
+                            with the incident.
+                        </p>
+
+                    </div>
+
+
+                    <div class="flex gap-3">
+
+                        <span class="text-xs font-bold text-blue-400">
+                            04
+                        </span>
+
+                        <p class="text-xs text-slate-400">
+                            Continue monitoring for related simulated indicators.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- REPORT METADATA -->
+            <!-- ================================================= -->
+
+            <div class="panel">
+
+                <div class="border-b border-slate-800 px-5 py-4">
+
+                    <h2 class="text-sm font-semibold text-slate-100">
+                        Report Metadata
+                    </h2>
+
+                </div>
+
+
+                <div class="space-y-3 p-5">
+
+
+                    <div class="flex justify-between gap-4">
+
+                        <span class="text-xs text-slate-500">
+                            Report ID
+                        </span>
+
+                        <span class="font-mono text-xs text-cyan-400">
+                            BLUF-2026-0042
+                        </span>
+
+                    </div>
+
+
+                    <div class="flex justify-between gap-4">
+
+                        <span class="text-xs text-slate-500">
+                            Investigation
+                        </span>
+
+                        <span class="font-mono text-xs text-slate-300">
+                            IR-2026-0042
+                        </span>
+
+                    </div>
+
+
+                    <div class="flex justify-between gap-4">
+
+                        <span class="text-xs text-slate-500">
+                            Analyst
+                        </span>
+
+                        <span class="text-xs text-slate-300">
+                            Alex Rao
+                        </span>
+
+                    </div>
+
+
+                    <div class="flex justify-between gap-4">
+
+                        <span class="text-xs text-slate-500">
+                            Classification
+                        </span>
+
+                        <span class="text-xs text-amber-400">
+                            DEMO / SIMULATED
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- SIMULATION NOTICE -->
+            <!-- ================================================= -->
+
+            <div class="rounded-lg border border-slate-800 bg-slate-950 p-4">
+
+                <div class="flex gap-3">
+
+                    <div class="text-cyan-400">
+                        ◈
+                    </div>
+
+                    <div>
+
+                        <p class="text-xs font-semibold text-slate-300">
+                            Simulation Notice
+                        </p>
+
+                        <p class="mt-1 text-xs leading-5 text-slate-500">
+                            This report contains simulated intelligence,
+                            evidence, risk scores and recommendations.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- FOOTER -->
+    <!-- ========================================================= -->
+
+    <div class="flex flex-col justify-between gap-3 px-1 sm:flex-row">
+
+        <div class="text-[10px] text-slate-600">
+            ARES — Threat Intelligence Command Center
+        </div>
+
+        <div class="text-[10px] text-amber-500/70">
+            DEMO ENVIRONMENT — All data shown is simulated.
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+<!-- ============================================================= -->
+<!-- JAVASCRIPT -->
+<!-- ============================================================= -->
+
+{% block scripts %}
+
+<script>
+
+function printReport() {
+
+    window.print();
+
+}
+
+
+function exportPDF() {
+
+    if (typeof showToast === "function") {
+
+        showToast(
+            "PDF export simulated. No real file was generated.",
+            "info"
+        );
+
+    } else {
+
+        alert(
+            "PDF export simulated. No real file was generated."
+        );
+
+    }
+
+}
+
+
+function markReviewed() {
+
+    if (typeof showToast === "function") {
+
+        showToast(
+            "BLUF report marked as reviewed.",
+            "success"
+        );
+
+    } else {
+
+        alert(
+            "BLUF report marked as reviewed."
+        );
+
+    }
+
+}
+
+</script>
+
+
+<style>
+
+@media print {
+
+    body {
+        background: white !important;
+        color: black !important;
+    }
+
+    aside,
+    header,
+    button {
+        display: none !important;
+    }
+
+    #blufReportContent {
+        display: block !important;
+    }
+
+    .panel {
+        break-inside: avoid;
+        margin-bottom: 20px;
+        border-color: #ddd !important;
+        background: white !important;
+        color: black !important;
+    }
+
+}
+
+</style>
+
+{% endblock %}

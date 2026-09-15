@@ -1,0 +1,3223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ARES — Threat Intelligence Command Center</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ares: {
+                            bg: "#07111F",
+                            panel: "#0B1728",
+                            panel2: "#0E1D31",
+                            border: "#1C3048",
+                            cyan: "#22D3EE",
+                            blue: "#38BDF8",
+                            green: "#22C55E",
+                            amber: "#F59E0B",
+                            red: "#EF4444",
+                            purple: "#A78BFA"
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #07111F;
+            color: #D8E3F0;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+                BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .panel {
+            background: #0B1728;
+            border: 1px solid #1C3048;
+        }
+
+        .sidebar-item {
+            transition: all 0.2s ease;
+            color: #94A3B8;
+        }
+
+        .sidebar-item:hover {
+            background: #0E1D31;
+            color: #E2E8F0;
+        }
+
+        .sidebar-item.active {
+            background: #0E263A;
+            color: #22D3EE;
+            border-left: 3px solid #22D3EE;
+        }
+
+        .scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .scrollbar::-webkit-scrollbar-track {
+            background: #07111F;
+        }
+
+        .scrollbar::-webkit-scrollbar-thumb {
+            background: #263B52;
+            border-radius: 10px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .04em;
+        }
+
+        .critical {
+            color: #F87171;
+            background: rgba(239, 68, 68, .12);
+            border: 1px solid rgba(239, 68, 68, .25);
+        }
+
+        .high {
+            color: #FBBF24;
+            background: rgba(245, 158, 11, .12);
+            border: 1px solid rgba(245, 158, 11, .25);
+        }
+
+        .medium {
+            color: #60A5FA;
+            background: rgba(59, 130, 246, .12);
+            border: 1px solid rgba(59, 130, 246, .25);
+        }
+
+        .low {
+            color: #4ADE80;
+            background: rgba(34, 197, 94, .12);
+            border: 1px solid rgba(34, 197, 94, .25);
+        }
+
+        .stat-card {
+            transition: transform .2s ease, border-color .2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: #31506E;
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .modal {
+            display: none;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .toast {
+            animation: slideIn .25s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .table-row:hover {
+            background: rgba(14, 29, 49, .8);
+        }
+
+        canvas {
+            max-width: 100%;
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+<div class="flex h-screen overflow-hidden">
+
+    <!-- =========================================================
+         SIDEBAR
+         ========================================================= -->
+
+    <aside
+        class="w-64 flex-shrink-0 bg-[#081321] border-r border-[#1C3048] flex flex-col"
+    >
+
+        <!-- BRAND -->
+
+        <div class="px-5 py-5 border-b border-[#1C3048]">
+
+            <div class="flex items-center gap-3">
+
+                <div
+                    class="w-10 h-10 rounded-lg bg-cyan-400/10 border border-cyan-400/30 flex items-center justify-center"
+                >
+                    <span class="text-cyan-400 text-xl font-bold">
+                        A
+                    </span>
+                </div>
+
+                <div>
+
+                    <h1 class="text-white font-bold tracking-[0.2em]">
+                        ARES
+                    </h1>
+
+                    <p class="text-[9px] text-slate-500 tracking-wider">
+                        THREAT INTELLIGENCE
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- NAVIGATION -->
+
+        <nav class="flex-1 px-3 py-4 overflow-y-auto scrollbar">
+
+            <p
+                class="px-3 mb-3 text-[10px] font-semibold text-slate-600 tracking-widest"
+            >
+                OPERATIONS
+            </p>
+
+
+            <button
+                onclick="navigate('dashboard')"
+                data-page="dashboard"
+                class="sidebar-item active w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm mb-1"
+            >
+
+                <span class="nav-icon">▦</span>
+
+                <span>Command Dashboard</span>
+
+            </button>
+
+
+            <button
+                onclick="navigate('alerts')"
+                data-page="alerts"
+                class="sidebar-item w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm mb-1"
+            >
+
+                <span class="nav-icon">⚠</span>
+
+                <span>Alert Intelligence</span>
+
+            </button>
+
+
+            <button
+                onclick="navigate('investigations')"
+                data-page="investigations"
+                class="sidebar-item w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm mb-1"
+            >
+
+                <span class="nav-icon">◉</span>
+
+                <span>Investigations</span>
+
+            </button>
+
+
+            <p
+                class="px-3 mt-6 mb-3 text-[10px] font-semibold text-slate-600 tracking-widest"
+            >
+                INTELLIGENCE
+            </p>
+
+
+            <button
+                onclick="navigate('mitre')"
+                data-page="mitre"
+                class="sidebar-item w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm mb-1"
+            >
+
+                <span class="nav-icon">⌘</span>
+
+                <span>MITRE ATT&CK</span>
+
+            </button>
+
+
+            <button
+                onclick="navigate('sources')"
+                data-page="sources"
+                class="sidebar-item w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm mb-1"
+            >
+
+                <span class="nav-icon">◎</span>
+
+                <span>Intelligence Sources</span>
+
+            </button>
+
+
+            <button
+                onclick="navigate('bluf')"
+                data-page="bluf"
+                class="sidebar-item w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm mb-1"
+            >
+
+                <span class="nav-icon">▤</span>
+
+                <span>Commander BLUF Reports</span>
+
+            </button>
+
+
+            <p
+                class="px-3 mt-6 mb-3 text-[10px] font-semibold text-slate-600 tracking-widest"
+            >
+                SYSTEM
+            </p>
+
+
+           
+
+        </nav>
+
+
+        
+
+                <div class="mt-3 pt-3 border-t border-[#1C3048]">
+
+                    <p class="text-[10px] text-slate-600">
+                        ANALYST
+                    </p>
+
+                    <p class="text-xs text-white mt-1">
+                        Alex Morgan
+                    </p>
+
+                    <p class="text-[10px] text-slate-500">
+                        SOC Analyst
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================================================
+         MAIN
+         ========================================================= -->
+
+    <main class="flex-1 flex flex-col min-w-0">
+
+
+        <!-- TOP BAR -->
+
+        <header
+            class="h-16 flex-shrink-0 bg-[#081321] border-b border-[#1C3048] px-6 flex items-center justify-between"
+        >
+
+            <div>
+
+                <h2
+                    id="pageTitle"
+                    class="text-lg font-semibold text-white"
+                >
+                    Command Dashboard
+                </h2>
+
+                <p class="text-[10px] text-slate-500 mt-1">
+                    ARES / Threat Intelligence Command Center
+                </p>
+
+            </div>
+
+
+            <div class="flex items-center gap-4">
+
+
+                <!-- SEARCH -->
+
+                <div class="relative hidden md:block">
+
+                    <span
+                        class="absolute left-3 top-2.5 text-slate-600"
+                    >
+                        ⌕
+                    </span>
+
+                    <input
+                        id="globalSearch"
+                        type="text"
+                        placeholder="Search ARES..."
+                        class="w-64 bg-[#0B1728] border border-[#1C3048] rounded-md pl-9 pr-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
+                    >
+
+                </div>
+
+
+                <!-- DEMO BADGE -->
+
+                <span
+                    class="badge text-cyan-400 bg-cyan-400/10 border border-cyan-400/20"
+                >
+                    SIMULATION
+                </span>
+
+
+                <!-- NOTIFICATION -->
+
+                <button
+                    onclick="showToast('No new simulated notifications')"
+                    class="text-slate-400 hover:text-white"
+                >
+                    🔔
+                </button>
+
+
+                <!-- USER -->
+
+                <div class="flex items-center gap-2">
+
+                    <div
+                        class="w-8 h-8 rounded-full bg-cyan-400/10 border border-cyan-400/20 flex items-center justify-center text-cyan-400 text-xs font-bold"
+                    >
+                        AM
+                    </div>
+
+                    <div class="hidden lg:block">
+
+                        <p class="text-xs text-white">
+                            Alex Morgan
+                        </p>
+
+                        <p class="text-[9px] text-slate-500">
+                            SOC Analyst
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =====================================================
+             CONTENT
+             ===================================================== -->
+
+        <div
+            class="flex-1 overflow-y-auto scrollbar p-6"
+        >
+
+
+            <!-- =================================================
+                 DASHBOARD
+                 ================================================= -->
+
+            <section
+                id="page-dashboard"
+                class="page active"
+            >
+
+               
+
+                <!-- STAT CARDS -->
+
+                <div
+                    class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4 mb-6"
+                >
+
+                    <div class="panel stat-card rounded-lg p-4">
+
+                        <p class="text-[10px] text-slate-500 tracking-wider">
+                            TOTAL ALERTS
+                        </p>
+
+                        <p class="text-2xl font-bold text-white mt-2">
+                            2,847
+                        </p>
+
+                        <p class="text-[10px] text-cyan-400 mt-2">
+                            ↑ 12.4% simulated
+                        </p>
+
+                    </div>
+
+
+                    <div class="panel stat-card rounded-lg p-4">
+
+                        <p class="text-[10px] text-slate-500 tracking-wider">
+                            CRITICAL ALERTS
+                        </p>
+
+                        <p class="text-2xl font-bold text-red-400 mt-2">
+                            37
+                        </p>
+
+                        <p class="text-[10px] text-red-400 mt-2">
+                            Requires attention
+                        </p>
+
+                    </div>
+
+
+                    <div class="panel stat-card rounded-lg p-4">
+
+                        <p class="text-[10px] text-slate-500 tracking-wider">
+                            ACTIVE INVESTIGATIONS
+                        </p>
+
+                        <p class="text-2xl font-bold text-amber-400 mt-2">
+                            18
+                        </p>
+
+                        <p class="text-[10px] text-slate-500 mt-2">
+                            6 high risk
+                        </p>
+
+                    </div>
+
+
+                    <div class="panel stat-card rounded-lg p-4">
+
+                        <p class="text-[10px] text-slate-500 tracking-wider">
+                            AVG RISK SCORE
+                        </p>
+
+                        <p class="text-2xl font-bold text-orange-400 mt-2">
+                            68.4
+                        </p>
+
+                        <p class="text-[10px] text-slate-500 mt-2">
+                            Out of 100
+                        </p>
+
+                    </div>
+
+
+                    <div class="panel stat-card rounded-lg p-4">
+
+                        <p class="text-[10px] text-slate-500 tracking-wider">
+                            CORRELATED INCIDENTS
+                        </p>
+
+                        <p class="text-2xl font-bold text-cyan-400 mt-2">
+                            124
+                        </p>
+
+                        <p class="text-[10px] text-green-400 mt-2">
+                            ↑ 8.2% simulated
+                        </p>
+
+                    </div>
+
+
+                    <div class="panel stat-card rounded-lg p-4">
+
+                        <p class="text-[10px] text-slate-500 tracking-wider">
+                            FALSE POSITIVE REDUCTION
+                        </p>
+
+                        <p class="text-2xl font-bold text-green-400 mt-2">
+                            42%
+                        </p>
+
+                        <p class="text-[10px] text-slate-500 mt-2">
+                            Simulated
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CHART ROW -->
+
+                <div
+                    class="grid grid-cols-1 xl:grid-cols-3 gap-5 mb-5"
+                >
+
+                    <!-- ALERT VOLUME -->
+
+                    <div
+                        class="panel rounded-lg p-5 xl:col-span-2"
+                    >
+
+                        <div class="flex justify-between items-center mb-5">
+
+                            <div>
+
+                                <h3 class="text-sm font-semibold text-white">
+                                    Alert Volume
+                                </h3>
+
+                                <p class="text-[10px] text-slate-500 mt-1">
+                                    Simulated multi-source activity
+                                </p>
+
+                            </div>
+
+                            <select
+                                id="alertPeriod"
+                                class="bg-[#081321] border border-[#1C3048] rounded px-3 py-2 text-[10px] text-slate-400 outline-none"
+                            >
+
+                                <option>24 Hours</option>
+                                <option>7 Days</option>
+                                <option>30 Days</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="h-64">
+                            <canvas id="alertVolumeChart"></canvas>
+                        </div>
+
+                    </div>
+
+
+                    <!-- SEVERITY -->
+
+                    <div
+                        class="panel rounded-lg p-5"
+                    >
+
+                        <h3 class="text-sm font-semibold text-white">
+                            Severity Distribution
+                        </h3>
+
+                        <p class="text-[10px] text-slate-500 mt-1 mb-4">
+                            Current simulated alert queue
+                        </p>
+
+                        <div class="h-64">
+                            <canvas id="severityChart"></canvas>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- LOWER ROW -->
+
+                <div
+                    class="grid grid-cols-1 xl:grid-cols-2 gap-5"
+                >
+
+                    <!-- SOURCE DISTRIBUTION -->
+
+                    <div class="panel rounded-lg p-5">
+
+                        <h3 class="text-sm font-semibold text-white">
+                            Intelligence Source Distribution
+                        </h3>
+
+                        <p class="text-[10px] text-slate-500 mt-1 mb-4">
+                            Simulated alert contribution
+                        </p>
+
+                        <div class="h-64">
+                            <canvas id="sourceChart"></canvas>
+                        </div>
+
+                    </div>
+
+
+                    <!-- INVESTIGATION WORKLOAD -->
+
+                    <div class="panel rounded-lg">
+
+                        <div class="px-5 py-4 border-b border-[#1C3048]">
+
+                            <h3 class="text-sm font-semibold text-white">
+                                Investigation Workload
+                            </h3>
+
+                            <p class="text-[10px] text-slate-500 mt-1">
+                                Active simulated cases
+                            </p>
+
+                        </div>
+
+
+                        <div class="p-5 space-y-4">
+
+                            <div>
+
+                                <div class="flex justify-between mb-2">
+
+                                    <span class="text-xs text-slate-400">
+                                        Critical
+                                    </span>
+
+                                    <span class="text-xs text-red-400">
+                                        6
+                                    </span>
+
+                                </div>
+
+                                <div class="h-2 bg-[#081321] rounded">
+
+                                    <div
+                                        class="h-2 bg-red-500 rounded"
+                                        style="width: 75%"
+                                    ></div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div>
+
+                                <div class="flex justify-between mb-2">
+
+                                    <span class="text-xs text-slate-400">
+                                        High
+                                    </span>
+
+                                    <span class="text-xs text-amber-400">
+                                        8
+                                    </span>
+
+                                </div>
+
+                                <div class="h-2 bg-[#081321] rounded">
+
+                                    <div
+                                        class="h-2 bg-amber-500 rounded"
+                                        style="width: 88%"
+                                    ></div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div>
+
+                                <div class="flex justify-between mb-2">
+
+                                    <span class="text-xs text-slate-400">
+                                        Medium
+                                    </span>
+
+                                    <span class="text-xs text-blue-400">
+                                        4
+                                    </span>
+
+                                </div>
+
+                                <div class="h-2 bg-[#081321] rounded">
+
+                                    <div
+                                        class="h-2 bg-blue-500 rounded"
+                                        style="width: 45%"
+                                    ></div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="pt-3 border-t border-[#1C3048]">
+
+                                <button
+                                    onclick="navigate('investigations')"
+                                    class="w-full border border-[#1C3048] hover:border-cyan-500 rounded-md py-2 text-xs text-slate-300 hover:text-cyan-400"
+                                >
+                                    Open Investigation Queue →
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- RECENT ACTIVITY -->
+
+                <div class="panel rounded-lg mt-5">
+
+                    <div
+                        class="px-5 py-4 border-b border-[#1C3048] flex justify-between"
+                    >
+
+                        <div>
+
+                            <h3 class="text-sm font-semibold text-white">
+                                Recent Activity
+                            </h3>
+
+                            <p class="text-[10px] text-slate-500 mt-1">
+                                Simulated analyst and correlation events
+                            </p>
+
+                        </div>
+
+                        <span class="text-[10px] text-green-400">
+                            LIVE SIMULATION
+                        </span>
+
+                    </div>
+
+
+                    <div class="divide-y divide-[#1C3048]">
+
+                        <div class="px-5 py-4 flex gap-3">
+
+                            <span class="w-2 h-2 rounded-full bg-red-400 mt-1.5"></span>
+
+                            <div>
+
+                                <p class="text-xs text-slate-200">
+                                    Critical alert correlated into investigation
+                                </p>
+
+                                <p class="text-[10px] text-slate-600 mt-1">
+                                    INV-1042 · 3 minutes ago
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="px-5 py-4 flex gap-3">
+
+                            <span class="w-2 h-2 rounded-full bg-cyan-400 mt-1.5"></span>
+
+                            <div>
+
+                                <p class="text-xs text-slate-200">
+                                    MITRE technique mapping updated
+                                </p>
+
+                                <p class="text-[10px] text-slate-600 mt-1">
+                                    T1059.001 · 12 minutes ago
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="px-5 py-4 flex gap-3">
+
+                            <span class="w-2 h-2 rounded-full bg-green-400 mt-1.5"></span>
+
+                            <div>
+
+                                <p class="text-xs text-slate-200">
+                                    Investigation marked as reviewed
+                                </p>
+
+                                <p class="text-[10px] text-slate-600 mt-1">
+                                    INV-1038 · 21 minutes ago
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 ALERT INTELLIGENCE
+                 ================================================= -->
+
+            <section
+                id="page-alerts"
+                class="page"
+            >
+
+                <div class="mb-5">
+
+                    <h2 class="text-xl font-semibold text-white">
+                        Alert Intelligence
+                    </h2>
+
+                    <p class="text-xs text-slate-500 mt-1">
+                        Correlate, prioritise and review simulated alerts
+                        from multiple intelligence sources.
+                    </p>
+
+                </div>
+
+
+                <!-- FILTERS -->
+
+                <div class="panel rounded-lg p-4 mb-5">
+
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-3"
+                    >
+
+                        <input
+                            id="alertSearch"
+                            oninput="renderAlerts()"
+                            placeholder="Search alerts..."
+                            class="bg-[#081321] border border-[#1C3048] rounded px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
+                        >
+
+
+                        <select
+                            id="severityFilter"
+                            onchange="renderAlerts()"
+                            class="bg-[#081321] border border-[#1C3048] rounded px-3 py-2 text-xs text-slate-300"
+                        >
+
+                            <option value="">
+                                All Severity
+                            </option>
+
+                            <option value="Critical">
+                                Critical
+                            </option>
+
+                            <option value="High">
+                                High
+                            </option>
+
+                            <option value="Medium">
+                                Medium
+                            </option>
+
+                            <option value="Low">
+                                Low
+                            </option>
+
+                        </select>
+
+
+                        <select
+                            id="sourceFilter"
+                            onchange="renderAlerts()"
+                            class="bg-[#081321] border border-[#1C3048] rounded px-3 py-2 text-xs text-slate-300"
+                        >
+
+                            <option value="">
+                                All Sources
+                            </option>
+
+                            <option>
+                                SIEM Alerts
+                            </option>
+
+                            <option>
+                                Network Sensor
+                            </option>
+
+                            <option>
+                                Authentication Logs
+                            </option>
+
+                            <option>
+                                Palo Alto Alerts
+                            </option>
+
+                            <option>
+                                Threat Intelligence
+                            </option>
+
+                        </select>
+
+
+                        <select
+                            id="statusFilter"
+                            onchange="renderAlerts()"
+                            class="bg-[#081321] border border-[#1C3048] rounded px-3 py-2 text-xs text-slate-300"
+                        >
+
+                            <option value="">
+                                All Status
+                            </option>
+
+                            <option>
+                                Open
+                            </option>
+
+                            <option>
+                                Investigating
+                            </option>
+
+                            <option>
+                                Reviewed
+                            </option>
+
+                        </select>
+
+
+                        <button
+                            onclick="sortAlertsByRisk()"
+                            class="border border-[#1C3048] hover:border-cyan-500 rounded px-3 py-2 text-xs text-slate-300 hover:text-cyan-400"
+                        >
+                            Sort by Risk
+                        </button>
+
+
+                        <button
+                            onclick="simulateCorrelation()"
+                            class="bg-cyan-500 hover:bg-cyan-400 text-black rounded px-3 py-2 text-xs font-semibold"
+                        >
+                            Simulate Correlation
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ALERT TABLE -->
+
+                <div class="panel rounded-lg overflow-hidden">
+
+                    <div
+                        class="px-5 py-4 border-b border-[#1C3048] flex justify-between items-center"
+                    >
+
+                        <div>
+
+                            <h3 class="text-sm font-semibold text-white">
+                                Alert Queue
+                            </h3>
+
+                            <p class="text-[10px] text-slate-500 mt-1">
+                                Multi-source simulated security alerts
+                            </p>
+
+                        </div>
+
+                        <span
+                            id="alertCount"
+                            class="text-[10px] text-cyan-400"
+                        >
+                            0 alerts
+                        </span>
+
+                    </div>
+
+
+                    <div class="overflow-x-auto">
+
+                        <table class="w-full">
+
+                            <thead class="bg-[#081321]">
+
+                                <tr
+                                    class="text-[9px] text-slate-600 tracking-wider"
+                                >
+
+                                    <th class="text-left px-5 py-3">
+                                        ALERT ID
+                                    </th>
+
+                                    <th class="text-left px-5 py-3">
+                                        TIMESTAMP
+                                    </th>
+
+                                    <th class="text-left px-5 py-3">
+                                        TITLE
+                                    </th>
+
+                                    <th class="text-left px-5 py-3">
+                                        SOURCE
+                                    </th>
+
+                                    <th class="text-left px-5 py-3">
+                                        ASSET
+                                    </th>
+
+                                    <th class="text-left px-5 py-3">
+                                        SEVERITY
+                                    </th>
+
+                                    <th class="text-left px-5 py-3">
+                                        RISK
+                                    </th>
+
+                                    <th class="text-left px-5 py-3">
+                                        STATUS
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody
+                                id="alertTableBody"
+                            ></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 INVESTIGATIONS
+                 ================================================= -->
+
+            <section
+                id="page-investigations"
+                class="page"
+            >
+
+                <div class="flex justify-between items-center mb-5">
+
+                    <div>
+
+                        <h2 class="text-xl font-semibold text-white">
+                            Investigations
+                        </h2>
+
+                        <p class="text-xs text-slate-500 mt-1">
+                            Correlated incidents requiring analyst review.
+                        </p>
+
+                    </div>
+
+                    <button
+                        onclick="showToast('New investigation created using simulated data')"
+                        class="bg-cyan-500 hover:bg-cyan-400 text-black px-4 py-2 rounded-md text-xs font-semibold"
+                    >
+                        + New Investigation
+                    </button>
+
+                </div>
+
+
+                <!-- INVESTIGATION STATS -->
+
+                <div
+                    class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5"
+                >
+
+                    <div class="panel rounded-lg p-4">
+
+                        <p class="text-[10px] text-slate-500">
+                            ACTIVE
+                        </p>
+
+                        <p class="text-2xl text-white font-bold mt-2">
+                            18
+                        </p>
+
+                    </div>
+
+
+                    <div class="panel rounded-lg p-4">
+
+                        <p class="text-[10px] text-slate-500">
+                            HIGH RISK
+                        </p>
+
+                        <p class="text-2xl text-red-400 font-bold mt-2">
+                            6
+                        </p>
+
+                    </div>
+
+
+                    <div class="panel rounded-lg p-4">
+
+                        <p class="text-[10px] text-slate-500">
+                            UNDER REVIEW
+                        </p>
+
+                        <p class="text-2xl text-amber-400 font-bold mt-2">
+                            7
+                        </p>
+
+                    </div>
+
+
+                    <div class="panel rounded-lg p-4">
+
+                        <p class="text-[10px] text-slate-500">
+                            RESOLVED
+                        </p>
+
+                        <p class="text-2xl text-green-400 font-bold mt-2">
+                            31
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SEARCH -->
+
+                <div class="panel rounded-lg p-4 mb-5">
+
+                    <input
+                        id="investigationSearch"
+                        oninput="renderInvestigations()"
+                        placeholder="Search investigations..."
+                        class="w-full md:w-96 bg-[#081321] border border-[#1C3048] rounded px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
+                    >
+
+                </div>
+
+
+                <!-- INVESTIGATION LIST -->
+
+                <div
+                    id="investigationList"
+                    class="space-y-3"
+                ></div>
+
+            </section>
+
+
+            <!-- =================================================
+                 MITRE
+                 ================================================= -->
+
+            <section
+                id="page-mitre"
+                class="page"
+            >
+
+                <div class="mb-5">
+
+                    <h2 class="text-xl font-semibold text-white">
+                        MITRE ATT&CK
+                    </h2>
+
+                    <p class="text-xs text-slate-500 mt-1">
+                        Simulated mapping of suspicious activity to
+                        attacker techniques and tactics.
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="panel rounded-lg p-4 mb-5 border-l-4 border-purple-400"
+                >
+
+                    <p class="text-xs text-purple-300">
+                        SIMULATED MITRE MAPPING
+                    </p>
+
+                    <p class="text-[10px] text-slate-500 mt-1">
+                        No real MITRE ATT&CK API integration is used.
+                        Technique mappings are demonstration data.
+                    </p>
+
+                </div>
+
+
+                <!-- MITRE STATS -->
+
+                <div
+                    class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-5"
+                >
+
+                    <div class="panel rounded-lg p-4">
+
+                        <p class="text-[10px] text-slate-500">
+                            TECHNIQUES MAPPED
+                        </p>
+
+                        <p class="text-2xl text-white font-bold mt-2">
+                            27
+                        </p>
+
+                    </div>
+
+
+                    <div class="panel rounded-lg p-4">
+
+                        <p class="text-[10px] text-slate-500">
+                            HIGH CONFIDENCE
+                        </p>
+
+                        <p class="text-2xl text-green-400 font-bold mt-2">
+                            19
+                        </p>
+
+                    </div>
+
+
+                    <div class="panel rounded-lg p-4">
+
+                        <p class="text-[10px] text-slate-500">
+                            ACTIVE TACTICS
+                        </p>
+
+                        <p class="text-2xl text-cyan-400 font-bold mt-2">
+                            9
+                        </p>
+
+                    </div>
+
+
+                    <div class="panel rounded-lg p-4">
+
+                        <p class="text-[10px] text-slate-500">
+                            INVESTIGATIONS
+                        </p>
+
+                        <p class="text-2xl text-amber-400 font-bold mt-2">
+                            18
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
+
+                    <!-- TECHNIQUE TABLE -->
+
+                    <div
+                        class="panel rounded-lg xl:col-span-2 overflow-hidden"
+                    >
+
+                        <div class="px-5 py-4 border-b border-[#1C3048]">
+
+                            <h3 class="text-sm font-semibold text-white">
+                                Technique Mapping
+                            </h3>
+
+                        </div>
+
+
+                        <div class="overflow-x-auto">
+
+                            <table class="w-full">
+
+                                <thead class="bg-[#081321]">
+
+                                    <tr class="text-[9px] text-slate-600">
+
+                                        <th class="text-left px-5 py-3">
+                                            TECHNIQUE
+                                        </th>
+
+                                        <th class="text-left px-5 py-3">
+                                            NAME
+                                        </th>
+
+                                        <th class="text-left px-5 py-3">
+                                            TACTIC
+                                        </th>
+
+                                        <th class="text-left px-5 py-3">
+                                            CONFIDENCE
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody id="mitreTable"></tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- TACTIC CHART -->
+
+                    <div class="panel rounded-lg p-5">
+
+                        <h3 class="text-sm font-semibold text-white">
+                            Tactic Distribution
+                        </h3>
+
+                        <p class="text-[10px] text-slate-500 mt-1 mb-4">
+                            Simulated technique distribution
+                        </p>
+
+                        <div class="h-64">
+
+                            <canvas id="mitreChart"></canvas>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 SOURCES
+                 ================================================= -->
+
+            <section
+                id="page-sources"
+                class="page"
+            >
+
+                <div class="mb-5">
+
+                    <h2 class="text-xl font-semibold text-white">
+                        Intelligence Sources
+                    </h2>
+
+                    <p class="text-xs text-slate-500 mt-1">
+                        Simulated sources feeding the ARES correlation layer.
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5"
+                    id="sourcesGrid"
+                ></div>
+
+            </section>
+
+
+            <!-- =================================================
+                 BLUF
+                 ================================================= -->
+
+            <section
+                id="page-bluf"
+                class="page"
+            >
+
+                <div class="flex justify-between items-center mb-5">
+
+                    <div>
+
+                        <h2 class="text-xl font-semibold text-white">
+                            Commander BLUF Reports
+                        </h2>
+
+                        <p class="text-xs text-slate-500 mt-1">
+                            Bottom Line Up Front reports generated from
+                            simulated investigations.
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        onclick="generateBLUF()"
+                        class="bg-cyan-500 hover:bg-cyan-400 text-black px-4 py-2 rounded-md text-xs font-semibold"
+                    >
+                        + Generate Simulated Report
+                    </button>
+
+                </div>
+
+
+                <div
+                    class="panel rounded-lg p-4 mb-5 border-l-4 border-green-400"
+                >
+
+                    <p class="text-xs text-green-300">
+                        COMMANDER-READY OUTPUT
+                    </p>
+
+                    <p class="text-[10px] text-slate-500 mt-1">
+                        Reports shown here are simulated and intended
+                        only for demonstration of the ARES workflow.
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="blufList"
+                    class="grid grid-cols-1 xl:grid-cols-2 gap-5"
+                ></div>
+
+            </section>
+
+
+            
+
+<!-- =============================================================
+     ALERT DETAIL MODAL
+     ============================================================= -->
+
+<div
+    id="alertModal"
+    class="modal fixed inset-0 z-50 items-center justify-center bg-black/70 p-4"
+>
+
+    <div
+        class="panel rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto scrollbar"
+    >
+
+        <div
+            class="px-5 py-4 border-b border-[#1C3048] flex justify-between items-center"
+        >
+
+            <div>
+
+                <p class="text-[10px] text-cyan-400">
+                    ALERT DETAILS
+                </p>
+
+                <h3
+                    id="modalAlertTitle"
+                    class="text-lg font-semibold text-white mt-1"
+                >
+                    Alert
+                </h3>
+
+            </div>
+
+            <button
+                onclick="closeModal('alertModal')"
+                class="text-slate-500 hover:text-white text-xl"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div
+            id="alertModalContent"
+            class="p-5"
+        ></div>
+
+    </div>
+
+</div>
+
+
+<!-- =============================================================
+     TOAST
+     ============================================================= -->
+
+<div
+    id="toastContainer"
+    class="fixed bottom-6 right-6 z-[100] space-y-2"
+></div>
+
+
+<script>
+
+/* ================================================================
+   MOCK DATA
+   ================================================================ */
+
+const ARES = {
+
+    alerts: [
+
+        {
+            id: "ALT-20481",
+            timestamp: "14:32:18",
+            title: "Multiple failed authentication attempts",
+            source: "Authentication Logs",
+            asset: "SRV-DC-02",
+            user: "admin",
+            severity: "High",
+            risk: 86,
+            correlation: "Correlated",
+            status: "Open"
+        },
+
+        {
+            id: "ALT-20480",
+            timestamp: "14:25:44",
+            title: "Suspicious PowerShell execution",
+            source: "Palo Alto Alerts",
+            asset: "WS-117",
+            user: "jsmith",
+            severity: "Critical",
+            risk: 94,
+            correlation: "Correlated",
+            status: "Investigating"
+        },
+
+        {
+            id: "ALT-20479",
+            timestamp: "14:18:22",
+            title: "Outbound connection to suspicious domain",
+            source: "Network Sensor",
+            asset: "WS-204",
+            user: "unknown",
+            severity: "High",
+            risk: 81,
+            correlation: "Pending",
+            status: "Open"
+        },
+
+        {
+            id: "ALT-20478",
+            timestamp: "14:02:11",
+            title: "Unusual privilege escalation",
+            source: "SIEM Alerts",
+            asset: "SRV-APP-01",
+            user: "svc_app",
+            severity: "Critical",
+            risk: 91,
+            correlation: "Correlated",
+            status: "Investigating"
+        },
+
+        {
+            id: "ALT-20477",
+            timestamp: "13:55:03",
+            title: "Large outbound data transfer",
+            source: "Network Sensor",
+            asset: "DB-03",
+            user: "backup",
+            severity: "Medium",
+            risk: 62,
+            correlation: "Pending",
+            status: "Open"
+        },
+
+        {
+            id: "ALT-20476",
+            timestamp: "13:40:52",
+            title: "Known malware signature detected",
+            source: "Palo Alto Alerts",
+            asset: "WS-088",
+            user: "miller",
+            severity: "High",
+            risk: 78,
+            correlation: "Correlated",
+            status: "Reviewed"
+        },
+
+        {
+            id: "ALT-20475",
+            timestamp: "13:32:10",
+            title: "Unexpected scheduled task creation",
+            source: "SIEM Alerts",
+            asset: "WS-092",
+            user: "SYSTEM",
+            severity: "Medium",
+            risk: 69,
+            correlation: "Correlated",
+            status: "Open"
+        },
+
+        {
+            id: "ALT-20474",
+            timestamp: "13:20:43",
+            title: "Repeated VPN login failures",
+            source: "Authentication Logs",
+            asset: "VPN-GW-01",
+            user: "remote-user",
+            severity: "Low",
+            risk: 41,
+            correlation: "Pending",
+            status: "Reviewed"
+        }
+
+    ],
+
+
+    investigations: [
+
+        {
+            id: "INV-1042",
+            title: "Potential Credential Compromise",
+            risk: 92,
+            severity: "Critical",
+            alerts: 14,
+            assets: 4,
+            analyst: "Alex Morgan",
+            status: "Investigating",
+            mitre: 5,
+            created: "Today, 13:42"
+        },
+
+        {
+            id: "INV-1041",
+            title: "Suspicious PowerShell Activity",
+            risk: 87,
+            severity: "High",
+            alerts: 9,
+            assets: 3,
+            analyst: "Sarah Patel",
+            status: "Investigating",
+            mitre: 4,
+            created: "Today, 12:30"
+        },
+
+        {
+            id: "INV-1040",
+            title: "Possible Data Exfiltration",
+            risk: 79,
+            severity: "High",
+            alerts: 7,
+            assets: 2,
+            analyst: "Alex Morgan",
+            status: "Review",
+            mitre: 3,
+            created: "Today, 11:15"
+        },
+
+        {
+            id: "INV-1039",
+            title: "Repeated Authentication Failures",
+            risk: 65,
+            severity: "Medium",
+            alerts: 5,
+            assets: 1,
+            analyst: "David Chen",
+            status: "Resolved",
+            mitre: 2,
+            created: "Today, 09:42"
+        }
+
+    ],
+
+
+    techniques: [
+
+        {
+            id: "T1059.001",
+            name: "PowerShell",
+            tactic: "Execution",
+            confidence: 94
+        },
+
+        {
+            id: "T1078",
+            name: "Valid Accounts",
+            tactic: "Initial Access",
+            confidence: 89
+        },
+
+        {
+            id: "T1053.005",
+            name: "Scheduled Task/Job",
+            tactic: "Persistence",
+            confidence: 82
+        },
+
+        {
+            id: "T1041",
+            name: "Exfiltration Over C2 Channel",
+            tactic: "Exfiltration",
+            confidence: 77
+        },
+
+        {
+            id: "T1548",
+            name: "Abuse Elevation Control Mechanism",
+            tactic: "Privilege Escalation",
+            confidence: 74
+        }
+
+    ],
+
+
+    sources: [
+
+        {
+            name: "SIEM Alerts",
+            events: 842,
+            reliability: "94%",
+            lastEvent: "2 minutes ago",
+            description: "Simulated security event alerts."
+        },
+
+        {
+            name: "Network Sensor Alerts",
+            events: 621,
+            reliability: "91%",
+            lastEvent: "4 minutes ago",
+            description: "Simulated network traffic detections."
+        },
+
+        {
+            name: "Authentication Logs",
+            events: 513,
+            reliability: "96%",
+            lastEvent: "1 minute ago",
+            description: "Simulated authentication activity."
+        },
+
+        {
+            name: "Palo Alto Alerts",
+            events: 447,
+            reliability: "93%",
+            lastEvent: "3 minutes ago",
+            description: "Simulated firewall security alerts."
+        },
+
+        {
+            name: "Threat Intelligence Reports",
+            events: 424,
+            reliability: "88%",
+            lastEvent: "8 minutes ago",
+            description: "Simulated external intelligence reports."
+        }
+
+    ],
+
+
+    reports: [
+
+        {
+            id: "BLUF-2201",
+            title: "Potential Credential Compromise",
+            risk: 92,
+            priority: "HIGH PRIORITY",
+            investigation: "INV-1042",
+            analyst: "Alex Morgan",
+            created: "Today 14:10"
+        },
+
+        {
+            id: "BLUF-2200",
+            title: "Suspicious PowerShell Campaign",
+            risk: 87,
+            priority: "HIGH PRIORITY",
+            investigation: "INV-1041",
+            analyst: "Sarah Patel",
+            created: "Today 12:54"
+        },
+
+        {
+            id: "BLUF-2199",
+            title: "Possible Data Exfiltration",
+            risk: 79,
+            priority: "PRIORITY",
+            investigation: "INV-1040",
+            analyst: "Alex Morgan",
+            created: "Today 11:40"
+        }
+
+    ]
+
+};
+
+
+/* ================================================================
+   NAVIGATION
+   ================================================================ */
+
+function navigate(page) {
+
+    document.querySelectorAll(".page").forEach(section => {
+        section.classList.remove("active");
+    });
+
+    const selected = document.getElementById("page-" + page);
+
+    if (selected) {
+        selected.classList.add("active");
+    }
+
+
+    document.querySelectorAll(".sidebar-item").forEach(item => {
+
+        item.classList.remove("active");
+
+        if (item.dataset.page === page) {
+            item.classList.add("active");
+        }
+
+    });
+
+
+    const titles = {
+
+        dashboard: "Command Dashboard",
+
+        alerts: "Alert Intelligence",
+
+        investigations: "Investigations",
+
+        mitre: "MITRE ATT&CK",
+
+        sources: "Intelligence Sources",
+
+        bluf: "Commander BLUF Reports",
+
+        settings: "Settings"
+
+    };
+
+
+    document.getElementById("pageTitle").innerText =
+        titles[page] || "ARES";
+
+
+    if (page === "alerts") {
+        renderAlerts();
+    }
+
+    if (page === "investigations") {
+        renderInvestigations();
+    }
+
+    if (page === "mitre") {
+        renderMitre();
+    }
+
+    if (page === "sources") {
+        renderSources();
+    }
+
+    if (page === "bluf") {
+        renderBLUF();
+    }
+
+}
+
+
+/* ================================================================
+   ALERTS
+   ================================================================ */
+
+function getSeverityClass(severity) {
+
+    return severity.toLowerCase();
+
+}
+
+
+function getRiskClass(risk) {
+
+    if (risk >= 90)
+        return "text-red-400";
+
+    if (risk >= 75)
+        return "text-orange-400";
+
+    if (risk >= 50)
+        return "text-yellow-400";
+
+    return "text-green-400";
+
+}
+
+
+function renderAlerts() {
+
+    const tbody =
+        document.getElementById("alertTableBody");
+
+    if (!tbody)
+        return;
+
+
+    const search =
+        (document.getElementById("alertSearch")?.value || "")
+            .toLowerCase();
+
+    const severity =
+        document.getElementById("severityFilter")?.value || "";
+
+    const source =
+        document.getElementById("sourceFilter")?.value || "";
+
+    const status =
+        document.getElementById("statusFilter")?.value || "";
+
+
+    const filtered = ARES.alerts.filter(alert => {
+
+        const matchesSearch =
+            alert.id.toLowerCase().includes(search) ||
+            alert.title.toLowerCase().includes(search) ||
+            alert.asset.toLowerCase().includes(search) ||
+            alert.user.toLowerCase().includes(search);
+
+
+        const matchesSeverity =
+            !severity ||
+            alert.severity === severity;
+
+
+        const matchesSource =
+            !source ||
+            alert.source.includes(source);
+
+
+        const matchesStatus =
+            !status ||
+            alert.status === status;
+
+
+        return (
+            matchesSearch &&
+            matchesSeverity &&
+            matchesSource &&
+            matchesStatus
+        );
+
+    });
+
+
+    tbody.innerHTML = "";
+
+
+    filtered.forEach(alert => {
+
+        const row =
+            document.createElement("tr");
+
+
+        row.className =
+            "table-row border-t border-[#1C3048] cursor-pointer";
+
+
+        row.onclick = () =>
+            openAlert(alert.id);
+
+
+        row.innerHTML = `
+
+            <td class="px-5 py-4 text-[11px] text-cyan-400 font-medium">
+                ${alert.id}
+            </td>
+
+            <td class="px-5 py-4 text-[10px] text-slate-500">
+                ${alert.timestamp}
+            </td>
+
+            <td class="px-5 py-4">
+
+                <p class="text-xs text-white">
+                    ${alert.title}
+                </p>
+
+                <p class="text-[10px] text-slate-600 mt-1">
+                    User: ${alert.user}
+                </p>
+
+            </td>
+
+            <td class="px-5 py-4 text-[10px] text-slate-400">
+                ${alert.source}
+            </td>
+
+            <td class="px-5 py-4 text-[10px] text-slate-300">
+                ${alert.asset}
+            </td>
+
+            <td class="px-5 py-4">
+
+                <span class="badge ${getSeverityClass(alert.severity)}">
+                    ${alert.severity}
+                </span>
+
+            </td>
+
+            <td class="px-5 py-4">
+
+                <span class="font-bold text-xs ${getRiskClass(alert.risk)}">
+                    ${alert.risk}
+                </span>
+
+            </td>
+
+            <td class="px-5 py-4 text-[10px]">
+
+                <span class="${alert.status === "Investigating"
+                    ? "text-amber-400"
+                    : alert.status === "Reviewed"
+                        ? "text-green-400"
+                        : "text-slate-400"
+                }">
+                    ${alert.status}
+                </span>
+
+            </td>
+
+        `;
+
+
+        tbody.appendChild(row);
+
+    });
+
+
+    const count =
+        document.getElementById("alertCount");
+
+
+    if (count) {
+
+        count.innerText =
+            filtered.length + " alerts";
+
+    }
+
+}
+
+
+function sortAlertsByRisk() {
+
+    ARES.alerts.sort((a, b) => b.risk - a.risk);
+
+    renderAlerts();
+
+    showToast(
+        "Alerts sorted by risk score"
+    );
+
+}
+
+
+function simulateCorrelation() {
+
+    showToast(
+        "Correlation simulation started..."
+    );
+
+
+    setTimeout(() => {
+
+        showToast(
+            "12 related alerts grouped into 3 simulated incidents."
+        );
+
+    }, 1200);
+
+}
+
+
+function openAlert(id) {
+
+    const alert =
+        ARES.alerts.find(item => item.id === id);
+
+
+    if (!alert)
+        return;
+
+
+    document.getElementById("modalAlertTitle").innerText =
+        alert.title;
+
+
+    document.getElementById("alertModalContent").innerHTML = `
+
+        <div class="grid grid-cols-2 gap-4">
+
+            <div>
+                <p class="text-[10px] text-slate-600">
+                    ALERT ID
+                </p>
+
+                <p class="text-xs text-cyan-400 mt-1">
+                    ${alert.id}
+                </p>
+            </div>
+
+
+            <div>
+                <p class="text-[10px] text-slate-600">
+                    RISK SCORE
+                </p>
+
+                <p class="text-xl font-bold ${getRiskClass(alert.risk)} mt-1">
+                    ${alert.risk}/100
+                </p>
+            </div>
+
+
+            <div>
+                <p class="text-[10px] text-slate-600">
+                    SOURCE
+                </p>
+
+                <p class="text-xs text-white mt-1">
+                    ${alert.source}
+                </p>
+            </div>
+
+
+            <div>
+                <p class="text-[10px] text-slate-600">
+                    ASSET
+                </p>
+
+                <p class="text-xs text-white mt-1">
+                    ${alert.asset}
+                </p>
+            </div>
+
+
+            <div>
+                <p class="text-[10px] text-slate-600">
+                    USER
+                </p>
+
+                <p class="text-xs text-white mt-1">
+                    ${alert.user}
+                </p>
+            </div>
+
+
+            <div>
+                <p class="text-[10px] text-slate-600">
+                    SEVERITY
+                </p>
+
+                <span class="badge ${getSeverityClass(alert.severity)} mt-1">
+                    ${alert.severity}
+                </span>
+            </div>
+
+        </div>
+
+
+        <div class="mt-6 pt-5 border-t border-[#1C3048]">
+
+            <p class="text-[10px] text-slate-600">
+                CORRELATION STATUS
+            </p>
+
+            <p class="text-xs text-cyan-400 mt-2">
+                ${alert.correlation}
+            </p>
+
+        </div>
+
+
+        <div class="mt-6 flex gap-3">
+
+            <button
+                onclick="markReviewed('${alert.id}')"
+                class="bg-cyan-500 text-black rounded px-4 py-2 text-xs font-semibold"
+            >
+                Mark Reviewed
+            </button>
+
+            <button
+                onclick="closeModal('alertModal')"
+                class="border border-[#1C3048] rounded px-4 py-2 text-xs"
+            >
+                Close
+            </button>
+
+        </div>
+
+    `;
+
+
+    document
+        .getElementById("alertModal")
+        .classList.add("active");
+
+}
+
+
+function markReviewed(id) {
+
+    const alert =
+        ARES.alerts.find(item => item.id === id);
+
+
+    if (alert) {
+
+        alert.status = "Reviewed";
+
+        closeModal("alertModal");
+
+        renderAlerts();
+
+        showToast(
+            id + " marked as reviewed"
+        );
+
+    }
+
+}
+
+
+/* ================================================================
+   INVESTIGATIONS
+   ================================================================ */
+
+function renderInvestigations() {
+
+    const container =
+        document.getElementById("investigationList");
+
+    if (!container)
+        return;
+
+
+    const search =
+        (document.getElementById("investigationSearch")?.value || "")
+            .toLowerCase();
+
+
+    const filtered =
+        ARES.investigations.filter(item =>
+
+            item.id.toLowerCase().includes(search) ||
+            item.title.toLowerCase().includes(search) ||
+            item.analyst.toLowerCase().includes(search)
+
+        );
+
+
+    container.innerHTML = "";
+
+
+    filtered.forEach(item => {
+
+        const card =
+            document.createElement("div");
+
+
+        card.className =
+            "panel rounded-lg p-5 hover:border-[#31506E]";
+
+
+        card.innerHTML = `
+
+            <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
+
+                <div class="flex-1">
+
+                    <div class="flex items-center gap-3">
+
+                        <span class="text-xs text-cyan-400 font-semibold">
+                            ${item.id}
+                        </span>
+
+                        <span class="badge ${item.severity.toLowerCase()}">
+                            ${item.severity}
+                        </span>
+
+                    </div>
+
+
+                    <h3 class="text-sm font-semibold text-white mt-3">
+                        ${item.title}
+                    </h3>
+
+
+                    <p class="text-[10px] text-slate-500 mt-1">
+                        Created ${item.created}
+                    </p>
+
+                </div>
+
+
+                <div class="grid grid-cols-4 gap-5">
+
+                    <div>
+                        <p class="text-[9px] text-slate-600">
+                            RISK
+                        </p>
+
+                        <p class="text-sm font-bold ${getRiskClass(item.risk)} mt-1">
+                            ${item.risk}
+                        </p>
+                    </div>
+
+
+                    <div>
+                        <p class="text-[9px] text-slate-600">
+                            ALERTS
+                        </p>
+
+                        <p class="text-sm text-white mt-1">
+                            ${item.alerts}
+                        </p>
+                    </div>
+
+
+                    <div>
+                        <p class="text-[9px] text-slate-600">
+                            ASSETS
+                        </p>
+
+                        <p class="text-sm text-white mt-1">
+                            ${item.assets}
+                        </p>
+                    </div>
+
+
+                    <div>
+                        <p class="text-[9px] text-slate-600">
+                            MITRE
+                        </p>
+
+                        <p class="text-sm text-purple-400 mt-1">
+                            ${item.mitre}
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="xl:w-40">
+
+                    <p class="text-[9px] text-slate-600">
+                        ANALYST
+                    </p>
+
+                    <p class="text-xs text-white mt-1">
+                        ${item.analyst}
+                    </p>
+
+                    <p class="text-[10px] text-amber-400 mt-2">
+                        ${item.status}
+                    </p>
+
+                </div>
+
+
+                <button
+                    onclick="openInvestigation('${item.id}')"
+                    class="border border-[#1C3048] hover:border-cyan-500 rounded px-4 py-2 text-xs text-slate-300 hover:text-cyan-400"
+                >
+                    Open
+                </button>
+
+            </div>
+
+        `;
+
+
+        container.appendChild(card);
+
+    });
+
+}
+
+
+function openInvestigation(id) {
+
+    const item =
+        ARES.investigations.find(i => i.id === id);
+
+
+    if (!item)
+        return;
+
+
+    showToast(
+        "Opening " + item.id + " investigation workspace"
+    );
+
+}
+
+
+/* ================================================================
+   MITRE
+   ================================================================ */
+
+function renderMitre() {
+
+    const table =
+        document.getElementById("mitreTable");
+
+    if (!table)
+        return;
+
+
+    table.innerHTML = "";
+
+
+    ARES.techniques.forEach(item => {
+
+        const row =
+            document.createElement("tr");
+
+
+        row.className =
+            "border-t border-[#1C3048]";
+
+
+        row.innerHTML = `
+
+            <td class="px-5 py-4 text-xs text-cyan-400">
+                ${item.id}
+            </td>
+
+            <td class="px-5 py-4 text-xs text-white">
+                ${item.name}
+            </td>
+
+            <td class="px-5 py-4 text-xs text-slate-400">
+                ${item.tactic}
+            </td>
+
+            <td class="px-5 py-4">
+
+                <div class="flex items-center gap-3">
+
+                    <div class="w-20 h-1.5 bg-[#081321] rounded">
+
+                        <div
+                            class="h-1.5 bg-cyan-400 rounded"
+                            style="width:${item.confidence}%"
+                        ></div>
+
+                    </div>
+
+                    <span class="text-[10px] text-slate-300">
+                        ${item.confidence}%
+                    </span>
+
+                </div>
+
+            </td>
+
+        `;
+
+
+        table.appendChild(row);
+
+    });
+
+}
+
+
+/* ================================================================
+   SOURCES
+   ================================================================ */
+
+function renderSources() {
+
+    const grid =
+        document.getElementById("sourcesGrid");
+
+    if (!grid)
+        return;
+
+
+    grid.innerHTML = "";
+
+
+    ARES.sources.forEach(source => {
+
+        const card =
+            document.createElement("div");
+
+
+        card.className =
+            "panel rounded-lg p-5";
+
+
+        card.innerHTML = `
+
+            <div class="flex justify-between items-start">
+
+                <div>
+
+                    <div
+                        class="w-10 h-10 rounded-lg bg-cyan-400/10 border border-cyan-400/20 flex items-center justify-center text-cyan-400"
+                    >
+                        ◎
+                    </div>
+
+                </div>
+
+                <span class="badge low">
+                    DEMO ACTIVE
+                </span>
+
+            </div>
+
+
+            <h3 class="text-sm font-semibold text-white mt-4">
+                ${source.name}
+            </h3>
+
+
+            <p class="text-[10px] text-slate-500 mt-2 leading-relaxed">
+                ${source.description}
+            </p>
+
+
+            <div class="grid grid-cols-2 gap-4 mt-5 pt-4 border-t border-[#1C3048]">
+
+                <div>
+
+                    <p class="text-[9px] text-slate-600">
+                        SIMULATED EVENTS
+                    </p>
+
+                    <p class="text-lg text-white font-semibold mt-1">
+                        ${source.events}
+                    </p>
+
+                </div>
+
+
+                <div>
+
+                    <p class="text-[9px] text-slate-600">
+                        RELIABILITY
+                    </p>
+
+                    <p class="text-lg text-green-400 font-semibold mt-1">
+                        ${source.reliability}
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <p class="text-[10px] text-slate-600 mt-4">
+                Last simulated event: ${source.lastEvent}
+            </p>
+
+        `;
+
+
+        grid.appendChild(card);
+
+    });
+
+}
+
+
+/* ================================================================
+   BLUF REPORTS
+   ================================================================ */
+
+function renderBLUF() {
+
+    const container =
+        document.getElementById("blufList");
+
+    if (!container)
+        return;
+
+
+    container.innerHTML = "";
+
+
+    ARES.reports.forEach(report => {
+
+        const card =
+            document.createElement("div");
+
+
+        card.className =
+            "panel rounded-lg p-5";
+
+
+        card.innerHTML = `
+
+            <div class="flex justify-between items-start">
+
+                <div>
+
+                    <p class="text-[10px] text-cyan-400">
+                        ${report.id}
+                    </p>
+
+                    <h3 class="text-sm font-semibold text-white mt-2">
+                        ${report.title}
+                    </h3>
+
+                </div>
+
+
+                <span class="badge high">
+                    ${report.priority}
+                </span>
+
+            </div>
+
+
+            <div class="mt-5">
+
+                <p class="text-[9px] text-slate-600 tracking-wider">
+                    BOTTOM LINE UP FRONT
+                </p>
+
+                <p class="text-xs text-slate-300 leading-relaxed mt-2">
+                    Simulated intelligence indicates a potentially
+                    coordinated security event requiring analyst
+                    review and commander awareness.
+                </p>
+
+            </div>
+
+
+            <div class="grid grid-cols-3 gap-4 mt-5 pt-4 border-t border-[#1C3048]">
+
+                <div>
+
+                    <p class="text-[9px] text-slate-600">
+                        RISK
+                    </p>
+
+                    <p class="text-lg font-bold ${getRiskClass(report.risk)} mt-1">
+                        ${report.risk}
+                    </p>
+
+                </div>
+
+
+                <div>
+
+                    <p class="text-[9px] text-slate-600">
+                        INVESTIGATION
+                    </p>
+
+                    <p class="text-xs text-cyan-400 mt-2">
+                        ${report.investigation}
+                    </p>
+
+                </div>
+
+
+                <div>
+
+                    <p class="text-[9px] text-slate-600">
+                        ANALYST
+                    </p>
+
+                    <p class="text-xs text-white mt-2">
+                        ${report.analyst}
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <button
+                onclick="openReport('${report.id}')"
+                class="w-full mt-5 border border-[#1C3048] hover:border-cyan-500 rounded py-2 text-xs text-slate-300 hover:text-cyan-400"
+            >
+                Open Report
+            </button>
+
+        `;
+
+
+        container.appendChild(card);
+
+    });
+
+}
+
+
+function generateBLUF() {
+
+    const newReport = {
+
+        id: "BLUF-" + (2202 + ARES.reports.length),
+
+        title: "Simulated Threat Correlation Report",
+
+        risk: 83,
+
+        priority: "PRIORITY",
+
+        investigation: "INV-1043",
+
+        analyst: "Alex Morgan",
+
+        created: "Just now"
+
+    };
+
+
+    ARES.reports.unshift(newReport);
+
+
+    renderBLUF();
+
+
+    showToast(
+        "Simulated BLUF report generated"
+    );
+
+}
+
+
+function openReport(id) {
+
+    const report =
+        ARES.reports.find(item => item.id === id);
+
+
+    if (!report)
+        return;
+
+
+    showToast(
+        "Opening " + report.id
+    );
+
+}
+
+
+/* ================================================================
+   MODALS
+   ================================================================ */
+
+function closeModal(id) {
+
+    const modal =
+        document.getElementById(id);
+
+
+    if (modal) {
+        modal.classList.remove("active");
+    }
+
+}
+
+
+/* ================================================================
+   TOAST
+   ================================================================ */
+
+function showToast(message) {
+
+    const container =
+        document.getElementById("toastContainer");
+
+
+    const toast =
+        document.createElement("div");
+
+
+    toast.className =
+        "toast panel rounded-lg px-4 py-3 text-xs text-slate-200 shadow-xl";
+
+
+    toast.innerHTML = `
+
+        <div class="flex items-center gap-3">
+
+            <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+
+            <span>
+                ${message}
+            </span>
+
+        </div>
+
+    `;
+
+
+    container.appendChild(toast);
+
+
+    setTimeout(() => {
+
+        toast.remove();
+
+    }, 3000);
+
+}
+
+
+/* ================================================================
+   CHARTS
+   ================================================================ */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        renderAlerts();
+
+        renderInvestigations();
+
+        renderMitre();
+
+        renderSources();
+
+        renderBLUF();
+
+        createCharts();
+
+    }
+);
+
+
+function createCharts() {
+
+    const chartOptions = {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        plugins: {
+
+            legend: {
+
+                labels: {
+                    color: "#94A3B8",
+                    font: {
+                        size: 10
+                    }
+                }
+
+            }
+
+        },
+
+        scales: {
+
+            x: {
+
+                grid: {
+                    color: "#17263A"
+                },
+
+                ticks: {
+                    color: "#64748B",
+                    font: {
+                        size: 9
+                    }
+                }
+
+            },
+
+            y: {
+
+                grid: {
+                    color: "#17263A"
+                },
+
+                ticks: {
+                    color: "#64748B",
+                    font: {
+                        size: 9
+                    }
+                }
+
+            }
+
+        }
+
+    };
+
+
+    /* ALERT VOLUME */
+
+    const alertCanvas =
+        document.getElementById("alertVolumeChart");
+
+
+    if (alertCanvas) {
+
+        new Chart(
+            alertCanvas,
+            {
+
+                type: "line",
+
+                data: {
+
+                    labels: [
+                        "00:00",
+                        "04:00",
+                        "08:00",
+                        "12:00",
+                        "16:00",
+                        "20:00"
+                    ],
+
+                    datasets: [
+
+                        {
+                            label: "Alerts",
+                            data: [
+                                42,
+                                68,
+                                91,
+                                127,
+                                102,
+                                138
+                            ],
+                            borderColor: "#22D3EE",
+                            backgroundColor: "rgba(34,211,238,.08)",
+                            borderWidth: 2,
+                            fill: true,
+                            tension: .35,
+                            pointRadius: 2
+                        }
+
+                    ]
+
+                },
+
+                options: chartOptions
+
+            }
+        );
+
+    }
+
+
+    /* SEVERITY */
+
+    const severityCanvas =
+        document.getElementById("severityChart");
+
+
+    if (severityCanvas) {
+
+        new Chart(
+            severityCanvas,
+            {
+
+                type: "doughnut",
+
+                data: {
+
+                    labels: [
+                        "Critical",
+                        "High",
+                        "Medium",
+                        "Low"
+                    ],
+
+                    datasets: [
+
+                        {
+                            data: [
+                                37,
+                                82,
+                                143,
+                                96
+                            ],
+                            backgroundColor: [
+                                "#EF4444",
+                                "#F59E0B",
+                                "#3B82F6",
+                                "#22C55E"
+                            ],
+                            borderWidth: 0
+                        }
+
+                    ]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+
+                        legend: {
+
+                            position: "bottom",
+
+                            labels: {
+                                color: "#94A3B8",
+                                font: {
+                                    size: 10
+                                }
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* SOURCE DISTRIBUTION */
+
+    const sourceCanvas =
+        document.getElementById("sourceChart");
+
+
+    if (sourceCanvas) {
+
+        new Chart(
+            sourceCanvas,
+            {
+
+                type: "bar",
+
+                data: {
+
+                    labels: [
+                        "SIEM",
+                        "Network",
+                        "Auth",
+                        "Palo Alto",
+                        "Intel"
+                    ],
+
+                    datasets: [
+
+                        {
+                            label: "Simulated Events",
+
+                            data: [
+                                842,
+                                621,
+                                513,
+                                447,
+                                424
+                            ],
+
+                            backgroundColor: "#38BDF8",
+
+                            borderRadius: 3
+
+                        }
+
+                    ]
+
+                },
+
+                options: chartOptions
+
+            }
+        );
+
+    }
+
+
+    /* MITRE */
+
+    const mitreCanvas =
+        document.getElementById("mitreChart");
+
+
+    if (mitreCanvas) {
+
+        new Chart(
+            mitreCanvas,
+            {
+
+                type: "bar",
+
+                data: {
+
+                    labels: [
+                        "Execution",
+                        "Initial Access",
+                        "Persistence",
+                        "Exfiltration",
+                        "Privilege Esc."
+                    ],
+
+                    datasets: [
+
+                        {
+                            label: "Mappings",
+
+                            data: [
+                                12,
+                                9,
+                                7,
+                                5,
+                                4
+                            ],
+
+                            backgroundColor: "#A78BFA",
+
+                            borderRadius: 3
+
+                        }
+
+                    ]
+
+                },
+
+                options: {
+
+                    ...chartOptions,
+
+                    indexAxis: "y"
+
+                }
+
+            }
+        );
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>

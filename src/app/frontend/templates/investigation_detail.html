@@ -1,0 +1,1303 @@
+{% extends "base.html" %}
+
+{% block title %}Investigation Detail | ARES{% endblock %}
+
+{% block page_title %}
+    Investigation Detail
+{% endblock %}
+
+{% block breadcrumb %}
+    <span>ARES</span>
+    <span class="text-slate-700">/</span>
+    <span>Investigations</span>
+    <span class="text-slate-700">/</span>
+    <span class="text-slate-300" id="breadcrumbClusterId">
+        {{ investigation.id }}
+    </span>
+{% endblock %}
+
+{% block content %}
+
+<div class="space-y-6">
+
+
+
+    <!-- =========================================================
+         HEADER
+         ========================================================= -->
+
+    <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+
+        <div>
+
+            <div class="flex items-center gap-2 mb-2">
+
+                <span id="detailClusterId"
+                      class="font-mono text-xs text-cyan-400">
+                    {{ investigation.id }}
+                </span>
+
+                <span id="detailSeverity"
+                      class="badge badge-red">
+                    {{ investigation.severity }}
+                </span>
+
+                <span class="badge badge-amber">
+                    {{ investigation.status }}
+                </span>
+
+            </div>
+
+            <h1 id="detailTitle"
+                class="text-2xl font-semibold text-slate-100">
+                {{ investigation.title }}
+            </h1>
+
+            <p class="text-sm text-slate-500 mt-2">
+                Correlated investigation created from simulated multi-source alerts.
+            </p>
+
+        </div>
+
+
+        <div class="flex items-center gap-2">
+
+            <button
+                onclick="updateInvestigationStatus()"
+                class="px-3 py-2 rounded-md border border-slate-700 bg-slate-900 text-xs text-slate-300 hover:text-cyan-400"
+            >
+                Update Status
+            </button>
+
+            <button
+                onclick="assignInvestigation()"
+                class="px-3 py-2 rounded-md bg-cyan-500 hover:bg-cyan-400 text-xs font-semibold text-slate-950"
+            >
+                Assign Analyst
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         SUMMARY
+         ========================================================= -->
+
+    <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-4">
+
+        <div class="panel p-4">
+
+            <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                Risk Score
+            </div>
+
+            <div id="detailRisk"
+                 class="text-2xl font-bold text-red-400 mt-2">
+                {{ investigation.risk }}
+            </div>
+
+        </div>
+
+
+        <div class="panel p-4">
+
+            <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                Alerts
+            </div>
+
+            <div id="detailAlerts"
+                 class="text-2xl font-bold text-slate-100 mt-2">
+                {{ investigation.alerts }}
+            </div>
+
+        </div>
+
+
+        <div class="panel p-4">
+
+            <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                Assets
+            </div>
+
+            <div id="detailAssets"
+                 class="text-2xl font-bold text-slate-100 mt-2">
+                {{ investigation.assets }}
+            </div>
+
+        </div>
+
+
+        <div class="panel p-4">
+
+            <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                MITRE
+            </div>
+
+            <div id="detailMitre"
+                 class="text-2xl font-bold text-cyan-400 mt-2">
+                {{ investigation.mitre_count }}
+            </div>
+
+        </div>
+
+
+        <div class="panel p-4">
+
+            <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                Confidence
+            </div>
+
+            <div id="detailConfidence"
+                 class="text-sm font-semibold text-cyan-400 mt-3">
+                —
+            </div>
+
+        </div>
+
+
+        <div class="panel p-4">
+
+            <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                Analyst
+            </div>
+
+            <div class="text-sm font-semibold text-slate-200 mt-3">
+                {{ investigation.analyst }}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         MAIN CONTENT
+         ========================================================= -->
+
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+
+        <!-- =====================================================
+             LEFT COLUMN
+             ===================================================== -->
+
+        <div class="xl:col-span-2 space-y-4">
+
+
+            <!-- =================================================
+                 INVESTIGATION TIMELINE
+                 ================================================= -->
+
+            <div class="panel">
+
+                <div class="px-5 py-4 border-b border-slate-800">
+
+                    <h2 class="text-sm font-semibold text-slate-100">
+                        Investigation Timeline
+                    </h2>
+
+                    <p class="text-xs text-slate-500 mt-1">
+                        Simulated sequence of investigation activity.
+                    </p>
+
+                </div>
+
+
+                <div class="p-5">
+
+                    <div class="relative pl-8 space-y-7">
+
+                        <div class="absolute left-2 top-2 bottom-2 w-px bg-slate-800"></div>
+
+
+                        <div class="relative">
+
+                            <div class="absolute -left-[25px] top-1 w-3 h-3 rounded-full bg-red-400 ring-4 ring-red-400/10"></div>
+
+                            <div class="flex items-center justify-between">
+
+                                <div class="text-xs font-semibold text-slate-200">
+                                    Correlated activity identified
+                                </div>
+
+                                <div class="text-[10px] text-slate-600">
+                                    Simulated
+                                </div>
+
+                            </div>
+
+                            <p class="text-xs text-slate-500 mt-1">
+                                Multiple simulated telemetry sources contributed alerts to this cluster.
+                            </p>
+
+                        </div>
+
+
+                        <div class="relative">
+
+                            <div class="absolute -left-[25px] top-1 w-3 h-3 rounded-full bg-cyan-400 ring-4 ring-cyan-400/10"></div>
+
+                            <div class="flex items-center justify-between">
+
+                                <div class="text-xs font-semibold text-slate-200">
+                                    Alerts correlated
+                                </div>
+
+                                <div class="text-[10px] text-slate-600">
+                                    {{ investigation.alerts }} alerts
+                                </div>
+
+                            </div>
+
+                            <p class="text-xs text-slate-500 mt-1">
+                                Backend correlation grouped the alerts into this investigation cluster.
+                            </p>
+
+                        </div>
+
+
+                        <div class="relative">
+
+                            <div class="absolute -left-[25px] top-1 w-3 h-3 rounded-full bg-amber-400 ring-4 ring-amber-400/10"></div>
+
+                            <div class="flex items-center justify-between">
+
+                                <div class="text-xs font-semibold text-slate-200">
+                                    Risk score calculated
+                                </div>
+
+                                <div class="text-[10px] text-slate-600">
+                                    Score {{ investigation.risk }}
+                                </div>
+
+                            </div>
+
+                            <p class="text-xs text-slate-500 mt-1">
+                                Multi-factor backend risk scoring produced a score of
+                                {{ investigation.risk }}.
+                            </p>
+
+                        </div>
+
+
+                        <div class="relative">
+
+                            <div class="absolute -left-[25px] top-1 w-3 h-3 rounded-full bg-blue-400 ring-4 ring-blue-400/10"></div>
+
+                            <div class="flex items-center justify-between">
+
+                                <div class="text-xs font-semibold text-slate-200">
+                                    MITRE ATT&amp;CK mapping completed
+                                </div>
+
+                                <div class="text-[10px] text-slate-600">
+                                    {{ investigation.mitre_count }} techniques
+                                </div>
+
+                            </div>
+
+                            <p class="text-xs text-slate-500 mt-1">
+                                Backend ATT&amp;CK mapping associated techniques with the correlated activity.
+                            </p>
+
+                        </div>
+
+
+                        <div class="relative">
+
+                            <div class="absolute -left-[25px] top-1 w-3 h-3 rounded-full bg-green-400 ring-4 ring-green-400/10"></div>
+
+                            <div class="flex items-center justify-between">
+
+                                <div class="text-xs font-semibold text-slate-200">
+                                    Analyst review
+                                </div>
+
+                                <div class="text-[10px] text-slate-600">
+                                    Simulated
+                                </div>
+
+                            </div>
+
+                            <p class="text-xs text-slate-500 mt-1">
+                                Investigation review workflow is simulated in this prototype.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 CORRELATED ALERTS
+                 ================================================= -->
+
+            <div class="panel overflow-hidden">
+
+                <div class="px-5 py-4 border-b border-slate-800">
+
+                    <h2 class="text-sm font-semibold text-slate-100">
+                        Correlated Alerts
+                    </h2>
+
+                    <p class="text-xs text-slate-500 mt-1">
+                        Alerts contributing to this selected investigation cluster.
+                    </p>
+
+                </div>
+
+
+                <div class="overflow-x-auto">
+
+                    <table class="w-full min-w-[850px]">
+
+                        <thead class="bg-slate-950/70 border-b border-slate-800">
+
+                            <tr class="text-[10px] uppercase tracking-wider text-slate-500">
+
+                                <th class="px-5 py-3 text-left">
+                                    Alert ID
+                                </th>
+
+                                <th class="px-5 py-3 text-left">
+                                    Title
+                                </th>
+
+                                <th class="px-5 py-3 text-left">
+                                    Source
+                                </th>
+
+                                <th class="px-5 py-3 text-left">
+                                    Severity
+                                </th>
+
+                                <th class="px-5 py-3 text-left">
+                                    Entity
+                                </th>
+
+                                <th class="px-5 py-3 text-left">
+                                    Status
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="invAlertTableBody"
+                               class="divide-y divide-slate-800">
+
+                            <tr>
+                                <td colspan="6"
+                                    class="px-5 py-8 text-center text-xs text-slate-500">
+                                    Loading alerts…
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 ANALYST WORKSPACE
+                 ================================================= -->
+
+            <div class="panel">
+
+                <div class="px-5 py-4 border-b border-slate-800">
+
+                    <h2 class="text-sm font-semibold text-slate-100">
+                        Analyst Workspace
+                    </h2>
+
+                    <p class="text-xs text-slate-500 mt-1">
+                        Add simulated investigation notes and observations.
+                    </p>
+
+                </div>
+
+
+                <div class="p-5">
+
+                    <textarea
+                        id="analystNotes"
+                        rows="5"
+                        placeholder="Enter analyst observations..."
+                        class="w-full bg-slate-950 border border-slate-700 rounded-md px-3 py-3 text-xs text-slate-300 placeholder-slate-600 outline-none focus:border-cyan-500 resize-none"
+                    ></textarea>
+
+
+                    <div class="flex justify-end mt-3">
+
+                        <button
+                            onclick="saveNotes()"
+                            class="px-4 py-2 rounded-md bg-cyan-500 hover:bg-cyan-400 text-xs font-semibold text-slate-950"
+                        >
+                            Save Notes
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             RIGHT COLUMN
+             ===================================================== -->
+
+        <div class="space-y-4">
+
+
+            <!-- =================================================
+                 RISK BREAKDOWN
+                 ================================================= -->
+
+            <div class="panel">
+
+                <div class="px-5 py-4 border-b border-slate-800">
+
+                    <h2 class="text-sm font-semibold text-slate-100">
+                        Risk Breakdown
+                    </h2>
+
+                    <p class="text-xs text-slate-500 mt-1">
+                        Backend risk-scoring factors for this cluster.
+                    </p>
+
+                </div>
+
+
+                <div id="riskBreakdownContainer"
+                     class="p-5 space-y-5">
+
+                    <div class="text-xs text-slate-500">
+                        Loading risk analysis…
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 MITRE ATT&CK
+                 ================================================= -->
+
+            <div class="panel">
+
+                <div class="px-5 py-4 border-b border-slate-800">
+
+                    <h2 class="text-sm font-semibold text-slate-100">
+                        MITRE ATT&amp;CK
+                    </h2>
+
+                    <p class="text-xs text-slate-500 mt-1">
+                        Backend-mapped techniques for this cluster.
+                    </p>
+
+                </div>
+
+
+                <div id="mitreTechniquesContainer"
+                     class="p-4 space-y-2">
+
+                    <div class="text-xs text-slate-500">
+                        Loading ATT&amp;CK mappings…
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 BLUF INTELLIGENCE
+                 ================================================= -->
+
+            <div class="panel">
+
+                <div class="px-5 py-4 border-b border-slate-800">
+
+                    <h2 class="text-sm font-semibold text-slate-100">
+                        BLUF Intelligence
+                    </h2>
+
+                    <p class="text-xs text-slate-500 mt-1">
+                        LLM-generated commander-ready assessment.
+                    </p>
+
+                </div>
+
+
+                <div class="p-5 space-y-4">
+
+                    <div>
+
+                        <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                            Threat Classification
+                        </div>
+
+                        <div id="blufClassification"
+                             class="text-sm font-semibold text-cyan-400 mt-2">
+                            Loading…
+                        </div>
+
+                    </div>
+
+
+                    <div>
+
+                        <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                            Confidence
+                        </div>
+
+                        <div id="blufConfidence"
+                             class="text-sm font-semibold text-slate-200 mt-2">
+                            —
+                        </div>
+
+                    </div>
+
+
+                    <div>
+
+                        <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                            Bottom Line
+                        </div>
+
+                        <p id="blufBottomLine"
+                           class="text-xs leading-5 text-slate-400 mt-2">
+                            Loading assessment…
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 RECOMMENDED ACTIONS
+                 ================================================= -->
+
+            <div class="panel">
+
+                <div class="px-5 py-4 border-b border-slate-800">
+
+                    <h2 class="text-sm font-semibold text-slate-100">
+                        Recommended Actions
+                    </h2>
+
+                    <p class="text-xs text-slate-500 mt-1">
+                        Generated recommendation from the simulated BLUF workflow.
+                    </p>
+
+                </div>
+
+
+                <div class="p-5">
+
+                    <div class="flex items-start gap-3">
+
+                        <span class="w-5 h-5 rounded-full bg-red-500/10 text-red-400 flex items-center justify-center text-[10px] shrink-0">
+                            !
+                        </span>
+
+                        <p id="blufRecommendation"
+                           class="text-xs leading-5 text-slate-400">
+                            Loading recommendation…
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+(function () {
+
+    /*
+     * The route supplies the selected cluster ID.
+     *
+     * Example:
+     * /investigations/cluster-ed93f591-719a-4c4a-b50c-e5742d9ae0aa
+     */
+
+    const clusterId = "{{ cluster_id }}";
+
+
+    // ------------------------------------------------------------
+    // HTML escaping
+    // ------------------------------------------------------------
+
+    function escHtml(value) {
+
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+
+    }
+
+
+    // ------------------------------------------------------------
+    // Basic DOM helper
+    // ------------------------------------------------------------
+
+    function setText(id, value) {
+
+        const element = document.getElementById(id);
+
+        if (element) {
+            element.textContent =
+                value ?? '—';
+        }
+
+    }
+
+
+    // ------------------------------------------------------------
+    // Severity styling
+    // ------------------------------------------------------------
+
+    function severityColor(value) {
+
+        const severity =
+            String(value || '').toUpperCase();
+
+        if (severity === 'CRITICAL') {
+            return 'text-red-400';
+        }
+
+        if (severity === 'HIGH') {
+            return 'text-amber-400';
+        }
+
+        if (severity === 'MEDIUM') {
+            return 'text-blue-400';
+        }
+
+        if (severity === 'LOW') {
+            return 'text-emerald-400';
+        }
+
+        return 'text-slate-400';
+
+    }
+
+
+    // ------------------------------------------------------------
+    // Render selected cluster
+    // ------------------------------------------------------------
+
+    function renderCluster(cluster) {
+
+        const alerts =
+            cluster.alerts || [];
+
+        const techniques =
+            cluster.attack_techniques || [];
+
+        const breakdown =
+            cluster.risk_breakdown || {};
+
+
+        setText(
+            'detailClusterId',
+            cluster.cluster_id
+        );
+
+        setText(
+            'breadcrumbClusterId',
+            cluster.cluster_id
+        );
+
+        setText(
+            'detailTitle',
+            cluster.title ||
+            'Correlated Threat Investigation'
+        );
+
+        setText(
+            'detailSeverity',
+            cluster.risk_level
+        );
+
+        setText(
+            'detailRisk',
+            cluster.risk_score
+        );
+
+        setText(
+            'detailAlerts',
+            alerts.length
+        );
+
+
+        const assets =
+            new Set(
+                alerts
+                    .map(function (alert) {
+                        return alert.entity;
+                    })
+                    .filter(Boolean)
+            );
+
+
+        setText(
+            'detailAssets',
+            assets.size
+        );
+
+        setText(
+            'detailMitre',
+            techniques.length
+        );
+
+
+        if (cluster.confidence !== undefined &&
+            cluster.confidence !== null) {
+
+            setText(
+                'detailConfidence',
+                Math.round(
+                    Number(cluster.confidence) * 100
+                ) + '%'
+            );
+
+        }
+
+
+        renderAlerts(cluster);
+
+        renderRiskBreakdown(breakdown);
+
+        renderMitre(techniques);
+
+    }
+
+
+    // ------------------------------------------------------------
+    // Correlated alerts
+    // ------------------------------------------------------------
+
+    function renderAlerts(cluster) {
+
+        const tbody =
+            document.getElementById(
+                'invAlertTableBody'
+            );
+
+        if (!tbody) {
+            return;
+        }
+
+
+        const alerts =
+            cluster.alerts || [];
+
+
+        if (!alerts.length) {
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6"
+                        class="px-5 py-8 text-center text-xs text-slate-500">
+                        No alerts in this cluster.
+                    </td>
+                </tr>
+            `;
+
+            return;
+
+        }
+
+
+        tbody.innerHTML =
+            alerts.map(function (alert) {
+
+                const severity =
+                    String(
+                        alert.severity_hint || '—'
+                    ).toUpperCase();
+
+
+                return `
+                    <tr class="hover:bg-slate-800/30">
+
+                        <td class="px-5 py-3 font-mono text-xs text-cyan-400">
+                            ${escHtml(alert.alert_id)}
+                        </td>
+
+                        <td class="px-5 py-3 text-xs text-slate-300">
+                            ${escHtml(alert.title)}
+                        </td>
+
+                        <td class="px-5 py-3 text-xs text-slate-500">
+                            ${escHtml(alert.source)}
+                        </td>
+
+                        <td class="px-5 py-3 text-xs font-semibold ${severityColor(severity)}">
+                            ${escHtml(severity)}
+                        </td>
+
+                        <td class="px-5 py-3 text-xs text-slate-400">
+                            ${escHtml(alert.entity || '—')}
+                        </td>
+
+                        <td class="px-5 py-3 text-xs text-cyan-400">
+                            Correlated
+                        </td>
+
+                    </tr>
+                `;
+
+            }).join('');
+
+    }
+
+
+    // ------------------------------------------------------------
+    // Risk breakdown
+    // ------------------------------------------------------------
+
+    function renderRiskBreakdown(breakdown) {
+
+        const container =
+            document.getElementById(
+                'riskBreakdownContainer'
+            );
+
+        if (!container) {
+            return;
+        }
+
+
+        const entries =
+            Object.entries(breakdown);
+
+
+        if (!entries.length) {
+
+            container.innerHTML = `
+                <div class="text-xs text-slate-500">
+                    No risk breakdown available.
+                </div>
+            `;
+
+            return;
+
+        }
+
+
+        container.innerHTML =
+            entries.map(function ([key, value]) {
+
+                const label =
+                    key
+                        .replaceAll('_', ' ')
+                        .replace(/\b\w/g, function (character) {
+                            return character.toUpperCase();
+                        });
+
+
+                const numericValue =
+                    Number(value) || 0;
+
+
+                const width =
+                    Math.min(
+                        Math.abs(numericValue),
+                        100
+                    );
+
+
+                const positive =
+                    numericValue >= 0;
+
+
+                return `
+                    <div>
+
+                        <div class="flex justify-between text-xs mb-2">
+
+                            <span class="text-slate-400">
+                                ${escHtml(label)}
+                            </span>
+
+                            <span class="${positive ? 'text-cyan-400' : 'text-amber-400'}">
+                                ${escHtml(numericValue)}
+                            </span>
+
+                        </div>
+
+                        <div class="h-1.5 rounded-full bg-slate-800 overflow-hidden">
+
+                            <div
+                                class="h-full ${positive ? 'bg-cyan-500' : 'bg-amber-500'} rounded-full"
+                                style="width:${width}%"
+                            ></div>
+
+                        </div>
+
+                    </div>
+                `;
+
+            }).join('');
+
+    }
+
+
+    // ------------------------------------------------------------
+    // MITRE ATT&CK
+    // ------------------------------------------------------------
+
+    function renderMitre(techniques) {
+
+        const container =
+            document.getElementById(
+                'mitreTechniquesContainer'
+            );
+
+        if (!container) {
+            return;
+        }
+
+
+        if (!techniques.length) {
+
+            container.innerHTML = `
+                <div class="text-xs text-slate-500">
+                    No ATT&amp;CK techniques mapped.
+                </div>
+            `;
+
+            return;
+
+        }
+
+
+    container.innerHTML =
+    techniques.map(function (technique) {
+
+        const techniqueId =
+            technique.technique_id || technique.id || 'Unknown';
+
+       const techniqueName =
+    technique.technique_name || 'Mapped technique';
+
+                return `
+                    <div class="p-3 rounded-md border border-slate-800 bg-slate-950/40">
+
+                        <div class="font-mono text-xs text-cyan-400">
+                            ${escHtml(techniqueId)}
+                        </div>
+
+                        <div class="text-xs text-slate-300 mt-1">
+                            ${escHtml(techniqueName)}
+                        </div>
+
+                        <div class="text-[10px] text-slate-600 mt-1">
+                            Backend correlation mapping
+                        </div>
+
+                    </div>
+                `;
+
+            }).join('');
+
+    }
+
+
+    // ------------------------------------------------------------
+    // BLUF report
+    // ------------------------------------------------------------
+
+    async function loadBluf(id) {
+
+        try {
+
+            const response =
+                await fetch(
+                    '/api/clusters/' +
+                    encodeURIComponent(id) +
+                    '/bluf'
+                );
+
+
+            if (!response.ok) {
+                return;
+            }
+
+
+            const bluf =
+                await response.json();
+
+
+            setText(
+                'blufClassification',
+                bluf.threat_classification ||
+                '—'
+            );
+
+
+            if (
+                bluf.confidence_percent !== undefined &&
+                bluf.confidence_percent !== null
+            ) {
+
+                setText(
+                    'blufConfidence',
+                    bluf.confidence_percent + '%'
+                );
+
+            }
+
+
+            setText(
+                'blufBottomLine',
+                bluf.bottom_line ||
+                'No BLUF assessment available.'
+            );
+
+
+            setText(
+                'blufRecommendation',
+                bluf.recommended_action ||
+                'No recommendation available.'
+            );
+
+
+        } catch (error) {
+
+            console.warn(
+                'BLUF unavailable:',
+                error
+            );
+
+        }
+
+    }
+
+
+    // ------------------------------------------------------------
+    // Load selected investigation
+    // ------------------------------------------------------------
+
+    async function loadInvestigation() {
+
+        if (!clusterId) {
+
+            showInvestigationError(
+                'No investigation cluster ID supplied.'
+            );
+
+            return;
+
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    '/api/clusters/' +
+                    encodeURIComponent(clusterId)
+                );
+
+
+            if (!response.ok) {
+
+                if (response.status === 404) {
+
+                    throw new Error(
+                        'Investigation cluster not found.'
+                    );
+
+                }
+
+                throw new Error(
+                    'HTTP ' +
+                    response.status
+                );
+
+            }
+
+
+            const cluster =
+                await response.json();
+
+
+            renderCluster(cluster);
+
+            await loadBluf(
+                cluster.cluster_id
+            );
+
+
+        } catch (error) {
+
+            showInvestigationError(
+                error.message
+            );
+
+        }
+
+    }
+
+
+    // ------------------------------------------------------------
+    // Error state
+    // ------------------------------------------------------------
+
+    function showInvestigationError(message) {
+
+        const tbody =
+            document.getElementById(
+                'invAlertTableBody'
+            );
+
+
+        if (tbody) {
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6"
+                        class="px-5 py-8 text-center text-xs text-red-400">
+                        ${escHtml(message)}
+                    </td>
+                </tr>
+            `;
+
+        }
+
+
+        setText(
+            'detailTitle',
+            'Investigation unavailable'
+        );
+
+
+        if (typeof showToast === 'function') {
+
+            showToast(
+                'Failed to load investigation: ' +
+                message,
+                'warning'
+            );
+
+        }
+
+    }
+
+
+    // ------------------------------------------------------------
+    // Start
+    // ------------------------------------------------------------
+
+    loadInvestigation();
+
+}());
+
+
+// ================================================================
+// SIMULATED INVESTIGATION WORKFLOW
+// ================================================================
+
+function saveNotes() {
+
+    const notes =
+        document
+            .getElementById('analystNotes')
+            .value
+            .trim();
+
+
+    if (!notes) {
+
+        if (typeof showToast === 'function') {
+
+            showToast(
+                'Enter a note before saving.',
+                'warning'
+            );
+
+        }
+
+        return;
+
+    }
+
+
+    if (typeof showToast === 'function') {
+
+        showToast(
+            'Investigation notes saved to the simulated workspace.',
+            'success'
+        );
+
+    }
+
+}
+
+
+function assignInvestigation() {
+
+    if (typeof showToast === 'function') {
+
+        showToast(
+            'Analyst assignment simulation opened.',
+            'info'
+        );
+
+    }
+
+}
+
+
+function updateInvestigationStatus() {
+
+    if (typeof showToast === 'function') {
+
+        showToast(
+            'Investigation status updated in simulation.',
+            'success'
+        );
+
+    }
+
+}
+
+</script>
+
+{% endblock %}

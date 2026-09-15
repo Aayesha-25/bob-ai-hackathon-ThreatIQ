@@ -1,0 +1,1392 @@
+{% extends "base.html" %}
+
+{% block title %}Command Dashboard | ARES{% endblock %}
+
+{% block page_title %}
+    Command Dashboard
+{% endblock %}
+
+{% block breadcrumb %}
+    <span>ARES</span>
+    <span class="text-slate-700">/</span>
+    <span class="text-slate-300">Command Dashboard</span>
+{% endblock %}
+
+{% block content %}
+
+<div class="space-y-6">
+
+   
+
+
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+
+        <div>
+
+            <div class="flex items-center gap-2 mb-2">
+
+                <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+
+                <span class="text-[10px] uppercase tracking-[0.2em] text-cyan-400 font-semibold">
+                    Threat Intelligence Operations
+                </span>
+
+            </div>
+
+            <h1 class="text-2xl font-semibold text-slate-100">
+                Command Dashboard
+            </h1>
+
+            <p class="text-sm text-slate-500 mt-1">
+                Unified view of simulated alert activity, risk, investigations and intelligence.
+            </p>
+
+        </div>
+
+
+        <div class="flex items-center gap-2">
+
+            <button
+                type="button"
+                onclick="simulateCorrelation()"
+                class="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-semibold transition-colors"
+            >
+
+                <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.5"
+                        d="M4 12h16M12 4l8 8-8 8"
+                    />
+                </svg>
+
+                Simulate Correlation
+
+            </button>
+
+
+            <button
+                type="button"
+                onclick="refreshDashboard()"
+                class="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-slate-700 bg-slate-900 text-slate-300 hover:text-cyan-400 hover:border-slate-600 text-xs font-medium transition-colors"
+            >
+
+                <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.5"
+                        d="M4 4v5h5M20 20v-5h-5M5.2 15a7 7 0 0011.8 2.1L20 14M4 10a7 7 0 0111.8-3.1L20 9"
+                    />
+                </svg>
+
+                Refresh
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         KPI CARDS
+    ====================================================== -->
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+
+
+        <!-- Total Alerts -->
+
+        <div class="panel p-5">
+
+            <div class="flex items-start justify-between">
+
+                <div>
+
+                    <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                        Total Alerts
+                    </div>
+
+                    <div
+                        class="text-3xl font-semibold text-slate-100 mt-2"
+                        id="kpiTotalAlerts"
+                    >
+                        —
+                    </div>
+
+                    <div class="text-xs text-slate-500 mt-2">
+                        Normalized from all sources
+                    </div>
+
+                </div>
+
+
+                <div class="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+
+                    <svg
+                        class="w-5 h-5 text-cyan-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="1.5"
+                            d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 00-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0v1a3 3 0 01-6 0v-1"
+                        />
+                    </svg>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Critical Clusters -->
+
+        <div class="panel p-5">
+
+            <div class="flex items-start justify-between">
+
+                <div>
+
+                    <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                        Critical Clusters
+                    </div>
+
+                    <div
+                        class="text-3xl font-semibold text-red-400 mt-2"
+                        id="kpiCritical"
+                    >
+                        —
+                    </div>
+
+                    <div class="text-xs text-slate-500 mt-2">
+                        Require immediate attention
+                    </div>
+
+                </div>
+
+
+                <div class="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+
+                    <svg
+                        class="w-5 h-5 text-red-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="1.5"
+                            d="M12 9v3m0 4h.01M10.29 3.86l-7.82 13.5A2 2 0 004.2 20h15.6a2 2 0 001.73-2.64l-7.82-13.5a2 2 0 00-3.42 0z"
+                        />
+                    </svg>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- High Clusters -->
+
+        <div class="panel p-5">
+
+            <div class="flex items-start justify-between">
+
+                <div>
+
+                    <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                        High Priority
+                    </div>
+
+                    <div
+                        class="text-3xl font-semibold text-amber-400 mt-2"
+                        id="kpiHigh"
+                    >
+                        —
+                    </div>
+
+                    <div class="text-xs text-slate-500 mt-2">
+                        Escalate to SOC lead
+                    </div>
+
+                </div>
+
+
+                <div class="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+
+                    <svg
+                        class="w-5 h-5 text-amber-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="1.5"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a3 3 0 006 0M9 5h6"
+                        />
+                    </svg>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Average Risk Score -->
+
+        <div class="panel p-5">
+
+            <div class="flex items-start justify-between">
+
+                <div>
+
+                    <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                        Average Risk Score
+                    </div>
+
+                    <div
+                        class="text-3xl font-semibold text-orange-400 mt-2"
+                        id="kpiAvgRisk"
+                    >
+                        —
+                    </div>
+
+                    <div class="text-xs text-slate-500 mt-2">
+                        Across all clusters
+                    </div>
+
+                </div>
+
+
+                <div class="w-10 h-10 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
+
+                    <svg
+                        class="w-5 h-5 text-orange-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="1.5"
+                            d="M3 17l6-6 4 4 8-9"
+                        />
+                    </svg>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Total Clusters -->
+
+        <div class="panel p-5">
+
+            <div class="flex items-start justify-between">
+
+                <div>
+
+                    <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                        Correlated Clusters
+                    </div>
+
+                    <div
+                        class="text-3xl font-semibold text-cyan-400 mt-2"
+                        id="kpiClusters"
+                    >
+                        —
+                    </div>
+
+                    <div class="text-xs text-slate-500 mt-2">
+                        Grouped alert sets
+                    </div>
+
+                </div>
+
+
+                <div class="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+
+                    <svg
+                        class="w-5 h-5 text-cyan-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="1.5"
+                            d="M7 12h10M12 7v10M5 5h4v4H5V5zm10 10h4v4h-4v-4z"
+                        />
+                    </svg>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Low / False Positive -->
+
+        <div class="panel p-5">
+
+            <div class="flex items-start justify-between">
+
+                <div>
+
+                    <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                        Low / False Positive
+                    </div>
+
+                    <div
+                        class="text-3xl font-semibold text-green-400 mt-2"
+                        id="kpiLowFP"
+                    >
+                        —
+                    </div>
+
+                    <div class="text-xs text-slate-500 mt-2">
+                        Low-risk or benign clusters
+                    </div>
+
+                </div>
+
+
+                <div class="w-10 h-10 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center">
+
+                    <svg
+                        class="w-5 h-5 text-green-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="1.5"
+                            d="M5 12l4 4L19 6"
+                        />
+                    </svg>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         ALERT VOLUME + SEVERITY
+    ====================================================== -->
+
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+
+
+        <!-- Alert Volume -->
+
+        <div class="panel xl:col-span-2">
+
+            <div class="flex items-center justify-between px-5 py-4 border-b border-slate-800">
+
+                <div>
+
+                    <h2 class="text-sm font-semibold text-slate-100">
+                        Alert Volume
+                    </h2>
+
+                    <p class="text-xs text-slate-500 mt-1">
+                        Simulated alert activity over the last 24 hours
+                    </p>
+
+                </div>
+
+
+                <select
+                    id="alertVolumeRange"
+                    class="bg-slate-900 border border-slate-700 text-xs text-slate-300 rounded-md px-2.5 py-1.5 outline-none focus:border-cyan-500"
+                >
+                    <option>24 Hours</option>
+                    <option>7 Days</option>
+                    <option>30 Days</option>
+                </select>
+
+            </div>
+
+
+            <div class="h-72 p-5">
+
+                <canvas id="alertVolumeChart"></canvas>
+
+            </div>
+
+        </div>
+
+
+        <!-- Severity -->
+
+        <div class="panel">
+
+            <div class="px-5 py-4 border-b border-slate-800">
+
+                <h2 class="text-sm font-semibold text-slate-100">
+                    Alert Severity
+                </h2>
+
+                <p class="text-xs text-slate-500 mt-1">
+                    Current simulated distribution
+                </p>
+
+            </div>
+
+
+            <div class="h-72 p-5">
+
+                <canvas id="severityChart"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SOURCE + INVESTIGATION WORKLOAD
+    ====================================================== -->
+
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+
+
+        <!-- Source Distribution -->
+
+        <div class="panel">
+
+            <div class="px-5 py-4 border-b border-slate-800">
+
+                <h2 class="text-sm font-semibold text-slate-100">
+                    Alert Source Distribution
+                </h2>
+
+                <p class="text-xs text-slate-500 mt-1">
+                    Simulated events by intelligence source
+                </p>
+
+            </div>
+
+
+            <div class="h-72 p-5">
+
+                <canvas id="sourceDistributionChart"></canvas>
+
+            </div>
+
+        </div>
+
+
+        <!-- Investigation Workload -->
+
+        <div class="panel">
+
+            <div class="px-5 py-4 border-b border-slate-800">
+
+                <h2 class="text-sm font-semibold text-slate-100">
+                    Investigation Workload
+                </h2>
+
+                <p class="text-xs text-slate-500 mt-1">
+                    Active simulated investigations by analyst
+                </p>
+
+            </div>
+
+
+            <div class="h-72 p-5">
+
+                <canvas id="investigationWorkloadChart"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         RECENT ACTIVITY + QUICK ACTIONS
+    ====================================================== -->
+
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+
+
+        <!-- Recent Activity -->
+
+        <div class="panel xl:col-span-2">
+
+            <div class="flex items-center justify-between px-5 py-4 border-b border-slate-800">
+
+                <div>
+
+                    <h2 class="text-sm font-semibold text-slate-100">
+                        Recent Activity
+                    </h2>
+
+                    <p class="text-xs text-slate-500 mt-1">
+                        Latest simulated analyst and correlation activity
+                    </p>
+
+                </div>
+
+
+                <span class="text-[10px] uppercase tracking-wider text-cyan-400">
+                    Live Simulation
+                </span>
+
+            </div>
+
+
+            <div class="divide-y divide-slate-800">
+
+
+                <div class="flex items-start gap-3 px-5 py-4">
+
+                    <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center shrink-0">
+
+                        <span class="w-2 h-2 rounded-full bg-red-400"></span>
+
+                    </div>
+
+
+                    <div class="flex-1 min-w-0">
+
+                        <div class="text-xs text-slate-300">
+
+                            Critical alert correlated into investigation
+
+                            <span class="font-mono text-cyan-400">
+                                INV-2041
+                            </span>
+
+                        </div>
+
+
+                        <div class="text-[10px] text-slate-500 mt-1">
+                            2 minutes ago · Correlation Engine
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="flex items-start gap-3 px-5 py-4">
+
+                    <div class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center shrink-0">
+
+                        <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+
+                    </div>
+
+
+                    <div class="flex-1 min-w-0">
+
+                        <div class="text-xs text-slate-300">
+
+                            7 related alerts grouped under
+
+                            <span class="font-mono text-cyan-400">
+                                CORR-881
+                            </span>
+
+                        </div>
+
+
+                        <div class="text-[10px] text-slate-500 mt-1">
+                            8 minutes ago · Correlation Engine
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="flex items-start gap-3 px-5 py-4">
+
+                    <div class="w-8 h-8 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center shrink-0">
+
+                        <span class="w-2 h-2 rounded-full bg-green-400"></span>
+
+                    </div>
+
+
+                    <div class="flex-1 min-w-0">
+
+                        <div class="text-xs text-slate-300">
+
+                            Investigation
+
+                            <span class="font-mono text-cyan-400">
+                                INV-2038
+                            </span>
+
+                            marked as reviewed
+
+                        </div>
+
+
+                        <div class="text-[10px] text-slate-500 mt-1">
+                            14 minutes ago · Analyst
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="flex items-start gap-3 px-5 py-4">
+
+                    <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+
+                        <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+
+                    </div>
+
+
+                    <div class="flex-1 min-w-0">
+
+                        <div class="text-xs text-slate-300">
+
+                            Simulated MITRE technique
+
+                            <span class="font-mono text-cyan-400">
+                                T1059
+                            </span>
+
+                            mapped to investigation
+
+                        </div>
+
+
+                        <div class="text-[10px] text-slate-500 mt-1">
+                            21 minutes ago · Intelligence Analysis
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Quick Actions -->
+
+        <div class="panel">
+
+            <div class="px-5 py-4 border-b border-slate-800">
+
+                <h2 class="text-sm font-semibold text-slate-100">
+                    Quick Actions
+                </h2>
+
+                <p class="text-xs text-slate-500 mt-1">
+                    Common analyst workflows
+                </p>
+
+            </div>
+
+
+            <div class="p-4 space-y-2">
+
+
+                <button
+                    type="button"
+                    onclick="window.location.href='/alerts'"
+                    class="w-full flex items-center gap-3 p-3 rounded-lg border border-slate-800 bg-slate-900/50 hover:border-cyan-500/30 hover:bg-cyan-500/5 transition-colors text-left"
+                >
+
+                    <div class="w-8 h-8 rounded-md bg-cyan-500/10 flex items-center justify-center">
+
+                        <svg
+                            class="w-4 h-4 text-cyan-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="1.5"
+                                d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 00-12 0v3.2a2 2 0 01-.6 1.4L4 17h5"
+                            />
+                        </svg>
+
+                    </div>
+
+
+                    <div>
+
+                        <div class="text-xs font-medium text-slate-200">
+                            Review Alerts
+                        </div>
+
+                        <div class="text-[10px] text-slate-500">
+                            Investigate incoming alerts
+                        </div>
+
+                    </div>
+
+                </button>
+
+
+                <button
+                    type="button"
+                    onclick="window.location.href='/investigations'"
+                    class="w-full flex items-center gap-3 p-3 rounded-lg border border-slate-800 bg-slate-900/50 hover:border-cyan-500/30 hover:bg-cyan-500/5 transition-colors text-left"
+                >
+
+                    <div class="w-8 h-8 rounded-md bg-amber-500/10 flex items-center justify-center">
+
+                        <svg
+                            class="w-4 h-4 text-amber-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="1.5"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"
+                            />
+                        </svg>
+
+                    </div>
+
+
+                    <div>
+
+                        <div class="text-xs font-medium text-slate-200">
+                            Investigations
+                        </div>
+
+                        <div class="text-[10px] text-slate-500">
+                            Review active cases
+                        </div>
+
+                    </div>
+
+                </button>
+
+
+                <button
+                    type="button"
+                    onclick="window.location.href='/mitre'"
+                    class="w-full flex items-center gap-3 p-3 rounded-lg border border-slate-800 bg-slate-900/50 hover:border-cyan-500/30 hover:bg-cyan-500/5 transition-colors text-left"
+                >
+
+                    <div class="w-8 h-8 rounded-md bg-blue-500/10 flex items-center justify-center">
+
+                        <svg
+                            class="w-4 h-4 text-blue-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="1.5"
+                                d="M9 12l2 2 4-4m5.6-5.4a9 9 0 11-12.73 0"
+                            />
+                        </svg>
+
+                    </div>
+
+
+                    <div>
+
+                        <div class="text-xs font-medium text-slate-200">
+                            MITRE Coverage
+                        </div>
+
+                        <div class="text-[10px] text-slate-500">
+                            Review mapped techniques
+                        </div>
+
+                    </div>
+
+                </button>
+
+
+                <button
+                    type="button"
+                    onclick="window.location.href='/bluf'"
+                    class="w-full flex items-center gap-3 p-3 rounded-lg border border-slate-800 bg-slate-900/50 hover:border-cyan-500/30 hover:bg-cyan-500/5 transition-colors text-left"
+                >
+
+                    <div class="w-8 h-8 rounded-md bg-green-500/10 flex items-center justify-center">
+
+                        <svg
+                            class="w-4 h-4 text-green-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="1.5"
+                                d="M9 12h6m-6 4h4m-7 5h10a2 2 0 002-2V7.8"
+                            />
+                        </svg>
+
+                    </div>
+
+
+                    <div>
+
+                        <div class="text-xs font-medium text-slate-200">
+                            BLUF Reports
+                        </div>
+
+                        <div class="text-[10px] text-slate-500">
+                            Commander-ready summaries
+                        </div>
+
+                    </div>
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         WORKFLOW
+    ====================================================== -->
+
+    <div class="panel">
+
+        <div class="px-5 py-4 border-b border-slate-800">
+
+            <h2 class="text-sm font-semibold text-slate-100">
+                Intelligence Workflow
+            </h2>
+
+            <p class="text-xs text-slate-500 mt-1">
+                Simulated ARES alert-to-decision workflow
+            </p>
+
+        </div>
+
+
+        <div class="p-5">
+
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+
+
+                <!-- Step 1 -->
+
+                <div class="relative p-4 rounded-lg bg-slate-900 border border-slate-800">
+
+                    <div class="text-[10px] uppercase tracking-wider text-cyan-400">
+                        01
+                    </div>
+
+                    <div class="text-sm font-semibold text-slate-200 mt-2">
+                        Alert
+                    </div>
+
+                    <p class="text-[11px] text-slate-500 mt-1">
+                        Simulated events enter the intelligence queue.
+                    </p>
+
+                </div>
+
+
+                <!-- Step 2 -->
+
+                <div class="relative p-4 rounded-lg bg-slate-900 border border-slate-800">
+
+                    <div class="text-[10px] uppercase tracking-wider text-cyan-400">
+                        02
+                    </div>
+
+                    <div class="text-sm font-semibold text-slate-200 mt-2">
+                        Correlation
+                    </div>
+
+                    <p class="text-[11px] text-slate-500 mt-1">
+                        Related simulated alerts are grouped.
+                    </p>
+
+                </div>
+
+
+                <!-- Step 3 -->
+
+                <div class="relative p-4 rounded-lg bg-slate-900 border border-slate-800">
+
+                    <div class="text-[10px] uppercase tracking-wider text-cyan-400">
+                        03
+                    </div>
+
+                    <div class="text-sm font-semibold text-slate-200 mt-2">
+                        Risk Scoring
+                    </div>
+
+                    <p class="text-[11px] text-slate-500 mt-1">
+                        Multiple factors produce a simulated risk score.
+                    </p>
+
+                </div>
+
+
+                <!-- Step 4 -->
+
+                <div class="relative p-4 rounded-lg bg-slate-900 border border-slate-800">
+
+                    <div class="text-[10px] uppercase tracking-wider text-cyan-400">
+                        04
+                    </div>
+
+                    <div class="text-sm font-semibold text-slate-200 mt-2">
+                        Investigation
+                    </div>
+
+                    <p class="text-[11px] text-slate-500 mt-1">
+                        Analysts review evidence and activity.
+                    </p>
+
+                </div>
+
+
+                <!-- Step 5 -->
+
+                <div class="relative p-4 rounded-lg bg-slate-900 border border-slate-800">
+
+                    <div class="text-[10px] uppercase tracking-wider text-green-400">
+                        05
+                    </div>
+
+                    <div class="text-sm font-semibold text-slate-200 mt-2">
+                        Decision
+                    </div>
+
+                    <div class="text-sm font-semibold text-slate-200 mt-1">
+                        BLUF
+                    </div>
+
+                    <p class="text-[11px] text-slate-500 mt-1">
+                        Generate a simulated commander-ready summary.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         FOOTER DEMO STATUS
+    ====================================================== -->
+
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-1">
+
+        <div class="flex items-center gap-2">
+
+            <span class="w-2 h-2 rounded-full bg-green-400"></span>
+
+            <span class="text-[10px] uppercase tracking-wider text-slate-500">
+                Simulation Engine Active
+            </span>
+
+        </div>
+
+
+        <div class="text-[10px] text-slate-600">
+            ARES Frontend Prototype · All values are simulated
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="{{ url_for('static', path='js/charts.js') }}"></script>
+
+
+<script>
+
+    // =========================================================
+    // DASHBOARD KPI LOADING
+    // =========================================================
+
+    async function loadDashboardKPIs() {
+
+        // -----------------------------------------------------
+        // Load overall backend status
+        // -----------------------------------------------------
+
+        try {
+
+            const statusRes =
+                await fetch('/api/status');
+
+            if (!statusRes.ok) {
+
+                throw new Error(
+                    'Status API returned HTTP ' +
+                    statusRes.status
+                );
+
+            }
+
+            const status =
+                await statusRes.json();
+
+
+            const set =
+                function (id, value) {
+
+                    const element =
+                        document.getElementById(id);
+
+                    if (element) {
+
+                        element.textContent =
+                            value;
+
+                    }
+
+                };
+
+
+            set(
+                'kpiTotalAlerts',
+                status.alert_count ?? '—'
+            );
+
+
+        } catch (error) {
+
+            console.warn(
+                'Dashboard /api/status fetch failed:',
+                error
+            );
+
+        }
+
+
+        // -----------------------------------------------------
+        // Load correlated cluster statistics
+        // -----------------------------------------------------
+
+        try {
+
+            const clustersRes =
+                await fetch('/api/clusters');
+
+
+            if (!clustersRes.ok) {
+
+                throw new Error(
+                    'Clusters API returned HTTP ' +
+                    clustersRes.status
+                );
+
+            }
+
+
+            const clusters =
+                await clustersRes.json();
+
+
+            let critical = 0;
+            let high = 0;
+            let lowFP = 0;
+            let totalScore = 0;
+
+
+            clusters.forEach(
+                function (cluster) {
+
+                    const level =
+                        (
+                            cluster.risk_level || ''
+                        ).toUpperCase();
+
+
+                    if (level === 'CRITICAL') {
+
+                        critical++;
+
+                    } else if (level === 'HIGH') {
+
+                        high++;
+
+                    } else if (
+                        level === 'LOW' ||
+                        level === 'LIKELY_FALSE_POSITIVE'
+                    ) {
+
+                        lowFP++;
+
+                    }
+
+
+                    totalScore +=
+                        Number(
+                            cluster.risk_score || 0
+                        );
+
+                }
+            );
+
+
+            const averageRisk =
+                clusters.length > 0
+                    ? Math.round(
+                        totalScore /
+                        clusters.length
+                    )
+                    : 0;
+
+
+            const set =
+                function (id, value) {
+
+                    const element =
+                        document.getElementById(id);
+
+                    if (element) {
+
+                        element.textContent =
+                            value;
+
+                    }
+
+                };
+
+
+            set(
+                'kpiClusters',
+                clusters.length
+            );
+
+            set(
+                'kpiCritical',
+                critical
+            );
+
+            set(
+                'kpiHigh',
+                high
+            );
+
+            set(
+                'kpiLowFP',
+                lowFP
+            );
+
+            set(
+                'kpiAvgRisk',
+                averageRisk
+            );
+
+
+        } catch (error) {
+
+            console.warn(
+                'Dashboard /api/clusters fetch failed:',
+                error
+            );
+
+        }
+
+    }
+
+
+    // =========================================================
+    // REFRESH DASHBOARD
+    // =========================================================
+
+    async function refreshDashboard() {
+
+        await loadDashboardKPIs();
+
+
+        if (
+            typeof refreshARESCharts ===
+            "function"
+        ) {
+
+            refreshARESCharts();
+
+        }
+
+
+        if (
+            typeof showToast ===
+            "function"
+        ) {
+
+            showToast(
+                "Dashboard refreshed using simulated data.",
+                "success"
+            );
+
+        }
+
+    }
+
+
+    // =========================================================
+    // SIMULATE CORRELATION
+    // =========================================================
+
+    function simulateCorrelation() {
+
+        if (
+            typeof showToast ===
+            "function"
+        ) {
+
+            showToast(
+                "Simulated correlation cycle completed. 12 alerts grouped into 3 incidents.",
+                "success"
+            );
+
+        }
+
+
+        setTimeout(
+            function () {
+
+                if (
+                    typeof refreshARESCharts ===
+                    "function"
+                ) {
+
+                    refreshARESCharts();
+
+                }
+
+            },
+            500
+        );
+
+    }
+
+
+    // =========================================================
+    // ALERT VOLUME RANGE
+    // =========================================================
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            const rangeSelector =
+                document.getElementById(
+                    "alertVolumeRange"
+                );
+
+
+            if (!rangeSelector) {
+
+                return;
+
+            }
+
+
+            rangeSelector.addEventListener(
+                "change",
+                function () {
+
+                    const selectedRange =
+                        this.value;
+
+
+                    if (
+                        typeof showToast ===
+                        "function"
+                    ) {
+
+                        showToast(
+                            "Alert volume range changed to " +
+                            selectedRange +
+                            ". Data remains simulated.",
+                            "info"
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+    // =========================================================
+    // INITIAL LOAD
+    // =========================================================
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            loadDashboardKPIs();
+
+        }
+    );
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+```
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>
+    {% block title %}
+    ARES — Threat Intelligence Command Center
+    {% endblock %}
+</title>
+
+
+<!-- Tailwind CSS -->
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+
+<!-- Chart.js -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<!-- Tailwind Configuration -->
+
+<script>
+
+    tailwind.config = {
+
+        theme: {
+
+            extend: {
+
+                colors: {
+
+                    ares: {
+
+                        bg: "#07111F",
+
+                        panel: "#0B1728",
+
+                        panel2: "#0E1D31",
+
+                        border: "#1C3048",
+
+                        cyan: "#22D3EE",
+
+                        blue: "#38BDF8",
+
+                        green: "#22C55E",
+
+                        amber: "#F59E0B",
+
+                        red: "#EF4444",
+
+                        purple: "#A78BFA"
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    };
+
+</script>
+
+
+<!-- Global Styles -->
+
+<style>
+
+    * {
+        box-sizing: border-box;
+    }
+
+
+    body {
+
+        margin: 0;
+
+        background: #07111F;
+
+        color: #D8E3F0;
+
+        font-family:
+            Inter,
+            ui-sans-serif,
+            system-ui,
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            sans-serif;
+
+    }
+
+
+    .panel {
+
+        background: #0B1728;
+
+        border: 1px solid #1C3048;
+
+    }
+
+
+    .sidebar-item {
+
+        transition: all 0.2s ease;
+
+        color: #94A3B8;
+
+    }
+
+
+    .sidebar-item:hover {
+
+        background: #0E1D31;
+
+        color: #E2E8F0;
+
+    }
+
+
+    .sidebar-item.active {
+
+        background: #0E263A;
+
+        color: #22D3EE;
+
+        border-left: 3px solid #22D3EE;
+
+    }
+
+
+    .scrollbar::-webkit-scrollbar {
+
+        width: 6px;
+
+        height: 6px;
+
+    }
+
+
+    .scrollbar::-webkit-scrollbar-track {
+
+        background: #07111F;
+
+    }
+
+
+    .scrollbar::-webkit-scrollbar-thumb {
+
+        background: #263B52;
+
+        border-radius: 10px;
+
+    }
+
+
+    .badge {
+
+        display: inline-flex;
+
+        align-items: center;
+
+        padding: 3px 8px;
+
+        border-radius: 5px;
+
+        font-size: 10px;
+
+        font-weight: 700;
+
+        letter-spacing: .04em;
+
+    }
+
+
+    .critical {
+
+        color: #F87171;
+
+        background: rgba(239, 68, 68, .12);
+
+        border:
+            1px solid
+            rgba(239, 68, 68, .25);
+
+    }
+
+
+    .high {
+
+        color: #FBBF24;
+
+        background: rgba(245, 158, 11, .12);
+
+        border:
+            1px solid
+            rgba(245, 158, 11, .25);
+
+    }
+
+
+    .medium {
+
+        color: #60A5FA;
+
+        background: rgba(59, 130, 246, .12);
+
+        border:
+            1px solid
+            rgba(59, 130, 246, .25);
+
+    }
+
+
+    .low {
+
+        color: #4ADE80;
+
+        background: rgba(34, 197, 94, .12);
+
+        border:
+            1px solid
+            rgba(34, 197, 94, .25);
+
+    }
+
+
+    .stat-card {
+
+        transition:
+            transform .2s ease,
+            border-color .2s ease;
+
+    }
+
+
+    .stat-card:hover {
+
+        transform: translateY(-2px);
+
+        border-color: #31506E;
+
+    }
+
+
+    .table-row:hover {
+
+        background:
+            rgba(14, 29, 49, .8);
+
+    }
+
+
+    .toast {
+
+        animation:
+            slideIn .25s ease-out;
+
+    }
+
+
+    @keyframes slideIn {
+
+        from {
+
+            transform:
+                translateY(20px);
+
+            opacity: 0;
+
+        }
+
+        to {
+
+            transform:
+                translateY(0);
+
+            opacity: 1;
+
+        }
+
+    }
+
+
+    .modal {
+
+        display: none;
+
+    }
+
+
+    .modal.active {
+
+        display: flex;
+
+    }
+
+</style>
+
+
+{% block extra_head %}{% endblock %}
+```
+
+</head>
+
+<body>
+
+```
+<!-- =========================================================
+     MAIN APPLICATION
+     ========================================================= -->
+
+
+<div class="flex h-screen overflow-hidden">
+
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+
+
+    <aside
+        class="w-64 flex-shrink-0
+               bg-[#081321]
+               border-r border-[#1C3048]
+               flex flex-col"
+    >
+
+
+        <!-- ARES BRAND -->
+
+
+        <div
+            class="px-5 py-5
+                   border-b border-[#1C3048]"
+        >
+
+            <div class="flex items-center gap-3">
+
+
+                <div
+                    class="w-10 h-10
+                           rounded-lg
+                           bg-cyan-400/10
+                           border border-cyan-400/30
+                           flex items-center
+                           justify-center"
+                >
+
+                    <span
+                        class="text-cyan-400
+                               text-xl
+                               font-bold"
+                    >
+                        A
+                    </span>
+
+                </div>
+
+
+                <div>
+
+                    <h1
+                        class="text-white
+                               font-bold
+                               tracking-[0.2em]"
+                    >
+                        ARES
+                    </h1>
+
+
+                    <p
+                        class="text-[9px]
+                               text-slate-500
+                               tracking-wider"
+                    >
+                        THREAT INTELLIGENCE
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- NAVIGATION -->
+
+
+        <nav
+            class="flex-1
+                   px-3
+                   py-4
+                   overflow-y-auto
+                   scrollbar"
+        >
+
+
+            <p
+                class="px-3
+                       mb-3
+                       text-[10px]
+                       font-semibold
+                       text-slate-600
+                       tracking-widest"
+            >
+                OPERATIONS
+            </p>
+
+
+            <a
+                href="/"
+                class="sidebar-item
+                       flex
+                       items-center
+                       gap-3
+                       px-3
+                       py-3
+                       rounded-md
+                       text-sm
+                       mb-1"
+            >
+
+                <span class="w-5 text-center">
+                    ▦
+                </span>
+
+                <span>
+                    Command Dashboard
+                </span>
+
+            </a>
+
+
+            <a
+                href="/alerts"
+                class="sidebar-item
+                       flex
+                       items-center
+                       gap-3
+                       px-3
+                       py-3
+                       rounded-md
+                       text-sm
+                       mb-1"
+            >
+
+                <span class="w-5 text-center">
+                    ⚠
+                </span>
+
+                <span>
+                    Alert Intelligence
+                </span>
+
+            </a>
+
+
+            <a
+                href="/investigations"
+                class="sidebar-item
+                       flex
+                       items-center
+                       gap-3
+                       px-3
+                       py-3
+                       rounded-md
+                       text-sm
+                       mb-1"
+            >
+
+                <span class="w-5 text-center">
+                    ◉
+                </span>
+
+                <span>
+                    Investigations
+                </span>
+
+            </a>
+
+
+            <p
+                class="px-3
+                       mt-6
+                       mb-3
+                       text-[10px]
+                       font-semibold
+                       text-slate-600
+                       tracking-widest"
+            >
+                INTELLIGENCE
+            </p>
+
+
+            <a
+                href="/mitre"
+                class="sidebar-item
+                       flex
+                       items-center
+                       gap-3
+                       px-3
+                       py-3
+                       rounded-md
+                       text-sm
+                       mb-1"
+            >
+
+                <span class="w-5 text-center">
+                    ⌘
+                </span>
+
+                <span>
+                    MITRE ATT&CK
+                </span>
+
+            </a>
+
+
+            <a
+                href="/sources"
+                class="sidebar-item
+                       flex
+                       items-center
+                       gap-3
+                       px-3
+                       py-3
+                       rounded-md
+                       text-sm
+                       mb-1"
+            >
+
+                <span class="w-5 text-center">
+                    ◎
+                </span>
+
+                <span>
+                    Intelligence Sources
+                </span>
+
+            </a>
+
+
+            <a
+                href="/bluf"
+                class="sidebar-item
+                       flex
+                       items-center
+                       gap-3
+                       px-3
+                       py-3
+                       rounded-md
+                       text-sm
+                       mb-1"
+            >
+
+                <span class="w-5 text-center">
+                    ▤
+                </span>
+
+                <span>
+                    Commander BLUF Reports
+                </span>
+
+            </a>
+
+
+            <p
+                class="px-3
+                       mt-6
+                       mb-3
+                       text-[10px]
+                       font-semibold
+                       text-slate-600
+                       tracking-widest"
+            >
+                SYSTEM
+            </p>
+
+
+            <a
+                href="/settings"
+                class="sidebar-item
+                       flex
+                       items-center
+                       gap-3
+                       px-3
+                       py-3
+                       rounded-md
+                       text-sm"
+            >
+
+                <span class="w-5 text-center">
+                    ⚙
+                </span>
+
+                <span>
+                    Settings
+                </span>
+
+            </a>
+
+
+        </nav>
+
+
+        <!-- =================================================
+             DEMO ENVIRONMENT
+             ================================================= -->
+
+
+        <div
+            class="p-4
+                   border-t
+                   border-[#1C3048]"
+        >
+
+            <div
+                class="panel
+                       rounded-lg
+                       p-3"
+            >
+
+
+                <div
+                    class="flex
+                           items-center
+                           gap-2"
+                >
+
+                    <span
+                        class="w-2
+                               h-2
+                               rounded-full
+                               bg-green-400"
+                    ></span>
+
+
+                    <span
+                        class="text-[10px]
+                               text-green-400
+                               font-bold"
+                    >
+                        DEMO ENVIRONMENT
+                    </span>
+
+                </div>
+
+
+                <p
+                    class="text-[10px]
+                           leading-relaxed
+                           text-slate-500
+                           mt-2"
+                >
+                    All data shown is simulated.
+                    No real-time system connectivity.
+                </p>
+
+
+                <div
+                    class="mt-3
+                           pt-3
+                           border-t
+                           border-[#1C3048]"
+                >
+
+                    <p
+                        class="text-[10px]
+                               text-slate-600"
+                    >
+                        ANALYST
+                    </p>
+
+
+                    <p
+                        class="text-xs
+                               text-white
+                               mt-1"
+                    >
+                        Alex Morgan
+                    </p>
+
+
+                    <p
+                        class="text-[10px]
+                               text-slate-500"
+                    >
+                        SOC Analyst
+                    </p>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN AREA
+         ===================================================== -->
+
+
+    <main
+        class="flex-1
+               flex
+               flex-col
+               min-w-0"
+    >
+
+
+        <!-- =================================================
+             TOP BAR
+             ================================================= -->
+
+
+        <header
+            class="h-16
+                   flex-shrink-0
+                   bg-[#081321]
+                   border-b
+                   border-[#1C3048]
+                   px-6
+                   flex
+                   items-center
+                   justify-between"
+        >
+
+
+            <!-- PAGE TITLE -->
+
+
+            <div>
+
+                <h2
+                    class="text-lg
+                           font-semibold
+                           text-white"
+                >
+
+                    {% block page_title %}
+                    Command Dashboard
+                    {% endblock %}
+
+                </h2>
+
+
+                <p
+                    class="text-[10px]
+                           text-slate-500
+                           mt-1"
+                >
+
+                    ARES /
+                    Threat Intelligence
+                    Command Center
+
+                </p>
+
+            </div>
+
+
+            <!-- TOP BAR ACTIONS -->
+
+
+            <div
+                class="flex
+                       items-center
+                       gap-4"
+            >
+
+
+                <!-- GLOBAL SEARCH -->
+
+
+                <div
+                    class="relative
+                           hidden
+                           md:block"
+                >
+
+                    <span
+                        class="absolute
+                               left-3
+                               top-2.5
+                               text-slate-600"
+                    >
+                        ⌕
+                    </span>
+
+
+                    <input
+                        id="globalSearch"
+                        type="text"
+                        placeholder="Search ARES..."
+                        class="w-64
+                               bg-[#0B1728]
+                               border
+                               border-[#1C3048]
+                               rounded-md
+                               pl-9
+                               pr-3
+                               py-2
+                               text-xs
+                               text-white
+                               outline-none
+                               focus:border-cyan-500"
+                    >
+
+                </div>
+
+
+                <!-- DEMO BADGE -->
+
+
+                <span
+                    class="badge
+                           text-cyan-400
+                           bg-cyan-400/10
+                           border
+                           border-cyan-400/20"
+                >
+                    SIMULATION
+                </span>
+
+
+                <!-- NOTIFICATIONS -->
+
+
+                <button
+                    type="button"
+                    onclick="showToast('No new simulated notifications')"
+                    class="text-slate-400
+                           hover:text-white"
+                >
+                    🔔
+                </button>
+
+
+                <!-- USER -->
+
+
+                <div
+                    class="flex
+                           items-center
+                           gap-2"
+                >
+
+                    <div
+                        class="w-8
+                               h-8
+                               rounded-full
+                               bg-cyan-400/10
+                               border
+                               border-cyan-400/20
+                               flex
+                               items-center
+                               justify-center
+                               text-cyan-400
+                               text-xs
+                               font-bold"
+                    >
+                        AM
+                    </div>
+
+
+                    <div
+                        class="hidden
+                               lg:block"
+                    >
+
+                        <p
+                            class="text-xs
+                                   text-white"
+                        >
+                            Alex Morgan
+                        </p>
+
+
+                        <p
+                            class="text-[9px]
+                                   text-slate-500"
+                        >
+                            SOC Analyst
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+        </header>
+
+
+        <!-- =================================================
+             PAGE CONTENT
+             ================================================= -->
+
+
+        <div
+            class="flex-1
+                   overflow-y-auto
+                   scrollbar
+                   p-6"
+        >
+
+            {% block content %}{% endblock %}
+
+        </div>
+
+
+    </main>
+
+
+</div>
+
+
+<!-- =========================================================
+     GLOBAL TOAST
+     ========================================================= -->
+
+
+<div
+    id="toastContainer"
+    class="fixed
+           bottom-6
+           right-6
+           z-[100]
+           space-y-2"
+>
+</div>
+
+
+<!-- =========================================================
+     GLOBAL JAVASCRIPT
+     ========================================================= -->
+
+
+<script>
+
+    /*
+     * Global ARES frontend helper functions.
+     *
+     * These functions are safe to use from
+     * dashboard.html, alerts.html, investigations.html,
+     * mitre.html, sources.html and bluf_reports.html.
+     */
+
+
+    /* -------------------------------------------------------
+       TOAST
+       ------------------------------------------------------- */
+
+
+    function showToast(message) {
+
+        const container =
+            document.getElementById(
+                "toastContainer"
+            );
+
+
+        if (!container) {
+            return;
+        }
+
+
+        const toast =
+            document.createElement("div");
+
+
+        toast.className =
+            "panel rounded-lg px-4 py-3 " +
+            "text-xs text-slate-200 shadow-xl";
+
+
+        toast.innerHTML = `
+
+            <div
+                class="flex
+                       items-center
+                       gap-3"
+            >
+
+                <span
+                    class="w-2
+                           h-2
+                           rounded-full
+                           bg-cyan-400"
+                ></span>
+
+                <span>
+                    ${message}
+                </span>
+
+            </div>
+
+        `;
+
+
+        container.appendChild(toast);
+
+
+        setTimeout(
+            function () {
+
+                toast.remove();
+
+            },
+            3000
+        );
+
+    }
+
+
+    /* -------------------------------------------------------
+       MODAL
+       ------------------------------------------------------- */
+
+
+    function openModal(id) {
+
+        const modal =
+            document.getElementById(id);
+
+
+        if (!modal) {
+            return;
+        }
+
+
+        modal.classList.add(
+            "active"
+        );
+
+    }
+
+
+    function closeModal(id) {
+
+        const modal =
+            document.getElementById(id);
+
+
+        if (!modal) {
+            return;
+        }
+
+
+        modal.classList.remove(
+            "active"
+        );
+
+    }
+
+
+    /* -------------------------------------------------------
+       GLOBAL SEARCH
+       ------------------------------------------------------- */
+
+
+    const globalSearch =
+        document.getElementById(
+            "globalSearch"
+        );
+
+
+    if (globalSearch) {
+
+        globalSearch.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Enter"
+                ) {
+
+                    const value =
+                        globalSearch
+                            .value
+                            .trim();
+
+
+                    if (value.length > 0) {
+
+                        showToast(
+                            "Searching ARES for: " +
+                            value
+                        );
+
+                    }
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* -------------------------------------------------------
+       MOBILE SIDEBAR SUPPORT
+       ------------------------------------------------------- */
+
+
+    function toggleSidebar() {
+
+        const sidebar =
+            document.querySelector(
+                "aside"
+            );
+
+
+        if (!sidebar) {
+            return;
+        }
+
+
+        sidebar.classList.toggle(
+            "hidden"
+        );
+
+    }
+
+</script>
+
+
+{% block scripts %}{% endblock %}
+```
+
+</body>
+
+</html>

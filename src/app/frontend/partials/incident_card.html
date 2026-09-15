@@ -1,0 +1,253 @@
+{#
+    ARES — Threat Intelligence Command Center
+    Partial: Investigation / Incident Card
+    DEMO DATA ONLY
+#}
+
+<div
+    class="panel group hover:border-slate-700 transition-colors duration-200"
+    data-investigation-id="{{ investigation.id }}"
+>
+
+    <!-- Header -->
+    <div class="flex items-start justify-between gap-4 px-5 py-4 border-b border-slate-800">
+
+        <div class="flex items-start gap-3">
+
+            <!-- Investigation Icon -->
+            <div class="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center shrink-0">
+
+                <svg
+                    class="w-5 h-5 text-cyan-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.5"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                </svg>
+
+            </div>
+
+            <div>
+                <div class="flex items-center gap-2">
+
+                    <span class="text-xs font-mono text-cyan-400">
+                        {{ investigation.id }}
+                    </span>
+
+                    {% if investigation.status == "Active" %}
+                        <span class="badge badge-red">
+                            Active
+                        </span>
+                    {% elif investigation.status == "Monitoring" %}
+                        <span class="badge badge-amber">
+                            Monitoring
+                        </span>
+                    {% elif investigation.status == "Resolved" %}
+                        <span class="badge badge-green">
+                            Resolved
+                        </span>
+                    {% else %}
+                        <span class="badge badge-slate">
+                            {{ investigation.status }}
+                        </span>
+                    {% endif %}
+
+                </div>
+
+                <h3 class="text-sm font-semibold text-slate-100 mt-1 group-hover:text-cyan-400 transition-colors">
+                    {{ investigation.title }}
+                </h3>
+
+            </div>
+
+        </div>
+
+
+        <!-- Risk Score -->
+        <div class="text-right shrink-0">
+
+            <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                Risk
+            </div>
+
+            {% if investigation.risk >= 80 %}
+                <div class="text-xl font-bold text-red-400">
+                    {{ investigation.risk }}
+                </div>
+            {% elif investigation.risk >= 60 %}
+                <div class="text-xl font-bold text-amber-400">
+                    {{ investigation.risk }}
+                </div>
+            {% else %}
+                <div class="text-xl font-bold text-green-400">
+                    {{ investigation.risk }}
+                </div>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- Investigation Details -->
+    <div class="px-5 py-4">
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+            <!-- Severity -->
+            <div>
+
+                <div class="text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                    Severity
+                </div>
+
+                {% if investigation.severity == "Critical" %}
+                    <span class="badge badge-red">
+                        Critical
+                    </span>
+                {% elif investigation.severity == "High" %}
+                    <span class="badge badge-amber">
+                        High
+                    </span>
+                {% elif investigation.severity == "Medium" %}
+                    <span class="badge badge-blue">
+                        Medium
+                    </span>
+                {% else %}
+                    <span class="badge badge-slate">
+                        {{ investigation.severity }}
+                    </span>
+                {% endif %}
+
+            </div>
+
+
+            <!-- Correlated Alerts -->
+            <div>
+
+                <div class="text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                    Correlated Alerts
+                </div>
+
+                <div class="text-sm font-semibold text-slate-200">
+                    {{ investigation.alerts }}
+                </div>
+
+            </div>
+
+
+            <!-- Affected Assets -->
+            <div>
+
+                <div class="text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                    Affected Assets
+                </div>
+
+                <div class="text-sm font-semibold text-slate-200">
+                    {{ investigation.assets }}
+                </div>
+
+            </div>
+
+
+            <!-- MITRE Techniques -->
+            <div>
+
+                <div class="text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                    MITRE Techniques
+                </div>
+
+                <div class="text-sm font-semibold text-cyan-400">
+                    {{ investigation.mitre_count }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Analyst / Created -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-5 pt-4 border-t border-slate-800">
+
+            <div class="flex items-center gap-3">
+
+                <div class="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-[10px] font-semibold text-slate-200">
+                    {{ investigation.analyst[:2]|upper }}
+                </div>
+
+                <div>
+
+                    <div class="text-xs text-slate-300">
+                        {{ investigation.analyst }}
+                    </div>
+
+                    <div class="text-[10px] text-slate-500">
+                        Assigned analyst
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="text-xs text-slate-500">
+
+                Created:
+                <span class="text-slate-400">
+                    {{ investigation.created }}
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Footer -->
+    <div class="flex items-center justify-between px-5 py-3 border-t border-slate-800 bg-slate-950/30">
+
+        <div class="flex items-center gap-2">
+
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+
+            <span class="text-[10px] uppercase tracking-wider text-slate-500">
+                Correlation active
+            </span>
+
+        </div>
+
+
+        <button
+            type="button"
+            onclick="openInvestigation('{{ investigation.id }}')"
+            class="text-xs font-medium text-cyan-400 hover:text-cyan-300 transition-colors inline-flex items-center gap-1"
+        >
+
+            View Investigation
+
+            <svg
+                class="w-3.5 h-3.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.5"
+                    d="M9 5l7 7-7 7"
+                />
+            </svg>
+
+        </button>
+
+    </div>
+
+</div>

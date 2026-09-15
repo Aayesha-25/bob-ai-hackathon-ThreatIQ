@@ -1,0 +1,953 @@
+{% extends "base.html" %}
+
+{% block title %}Settings | ARES{% endblock %}
+
+{% block page_title %}
+    Settings
+{% endblock %}
+
+{% block breadcrumb %}
+    <span>ARES</span>
+    <span class="text-slate-700">/</span>
+    <span class="text-slate-300">Settings</span>
+{% endblock %}
+
+{% block content %}
+
+<div class="space-y-6">
+
+    <!-- DEMO NOTICE -->
+    <div class="flex items-start gap-3 p-4 rounded-lg border border-amber-500/20 bg-amber-500/5">
+
+        <svg class="w-5 h-5 text-amber-400 mt-0.5 shrink-0"
+             fill="none"
+             stroke="currentColor"
+             viewBox="0 0 24 24">
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.5"
+                  d="M12 9v2m0 4h.01M10.29 3.86l-7.82 13.5A2 2 0 004.2 20h15.6a2 2 0 001.73-2.64l-7.82-13.5a2 2 0 001.73-2.64z"/>
+        </svg>
+
+        <div>
+            <div class="text-xs font-semibold text-amber-300 uppercase tracking-wider">
+                Demo Environment
+            </div>
+
+            <p class="text-xs text-slate-400 mt-1">
+                These settings are frontend-only preferences. No backend configuration
+                or real system connection is modified.
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- HEADER -->
+    <div>
+        <h1 class="text-2xl font-semibold text-slate-100">
+            Settings
+        </h1>
+
+        <p class="text-sm text-slate-500 mt-1">
+            Configure the ARES dashboard experience.
+        </p>
+    </div>
+
+
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+
+        <!-- LEFT SETTINGS -->
+        <div class="xl:col-span-2 space-y-4">
+
+            <!-- Appearance -->
+            <section class="panel">
+
+                <div class="px-5 py-4 border-b border-slate-800">
+
+                    <h2 class="text-sm font-semibold text-slate-100">
+                        Appearance
+                    </h2>
+
+                    <p class="text-xs text-slate-500 mt-1">
+                        Customize the visual presentation of the command center.
+                    </p>
+
+                </div>
+
+
+                <div class="p-5 space-y-5">
+
+                    <div class="flex items-center justify-between gap-5">
+
+                        <div>
+
+                            <div class="text-xs font-medium text-slate-200">
+                                Interface Theme
+                            </div>
+
+                            <p class="text-[11px] text-slate-500 mt-1">
+                                ARES uses a dark SOC-oriented interface.
+                            </p>
+
+                        </div>
+
+
+                        <select
+                            id="themeSelect"
+                            class="bg-slate-950 border border-slate-700 rounded-md px-3 py-2 text-xs text-slate-300 outline-none focus:border-cyan-500"
+                        >
+
+                            <option value="dark">
+                                Dark
+                            </option>
+
+                            <option value="system">
+                                System
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="flex items-center justify-between gap-5">
+
+                        <div>
+
+                            <div class="text-xs font-medium text-slate-200">
+                                Compact Mode
+                            </div>
+
+                            <p class="text-[11px] text-slate-500 mt-1">
+                                Reduce spacing to display more intelligence data.
+                            </p>
+
+                        </div>
+
+
+                        <label class="relative inline-flex items-center cursor-pointer">
+
+                            <input
+                                type="checkbox"
+                                id="compactMode"
+                                class="sr-only peer"
+                            >
+
+                            <div class="w-10 h-5 bg-slate-700 rounded-full
+                                        peer-checked:bg-cyan-500
+                                        after:content-['']
+                                        after:absolute
+                                        after:top-[2px]
+                                        after:left-[2px]
+                                        after:bg-white
+                                        after:rounded-full
+                                        after:h-4
+                                        after:w-4
+                                        after:transition-all
+                                        peer-checked:after:translate-x-5">
+                            </div>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- Dashboard Preferences -->
+            <section class="panel">
+
+                <div class="px-5 py-4 border-b border-slate-800">
+
+                    <h2 class="text-sm font-semibold text-slate-100">
+                        Dashboard Preferences
+                    </h2>
+
+                    <p class="text-xs text-slate-500 mt-1">
+                        Control which information is emphasized on the dashboard.
+                    </p>
+
+                </div>
+
+
+                <div class="p-5 space-y-4">
+
+                    <label class="flex items-center justify-between gap-5 cursor-pointer">
+
+                        <div>
+
+                            <div class="text-xs font-medium text-slate-200">
+                                Show Recent Activity
+                            </div>
+
+                            <p class="text-[11px] text-slate-500 mt-1">
+                                Display the recent simulated intelligence activity feed.
+                            </p>
+
+                        </div>
+
+                        <input
+                            id="showActivity"
+                            type="checkbox"
+                            checked
+                            class="w-4 h-4 accent-cyan-500"
+                        >
+
+                    </label>
+
+
+                    <label class="flex items-center justify-between gap-5 cursor-pointer">
+
+                        <div>
+
+                            <div class="text-xs font-medium text-slate-200">
+                                Show Investigation Workload
+                            </div>
+
+                            <p class="text-[11px] text-slate-500 mt-1">
+                                Display analyst workload visualization.
+                            </p>
+
+                        </div>
+
+                        <input
+                            id="showWorkload"
+                            type="checkbox"
+                            checked
+                            class="w-4 h-4 accent-cyan-500"
+                        >
+
+                    </label>
+
+
+                    <label class="flex items-center justify-between gap-5 cursor-pointer">
+
+                        <div>
+
+                            <div class="text-xs font-medium text-slate-200">
+                                Show Quick Actions
+                            </div>
+
+                            <p class="text-[11px] text-slate-500 mt-1">
+                                Display dashboard shortcuts for common workflows.
+                            </p>
+
+                        </div>
+
+                        <input
+                            id="showQuickActions"
+                            type="checkbox"
+                            checked
+                            class="w-4 h-4 accent-cyan-500"
+                        >
+
+                    </label>
+
+                </div>
+
+            </section>
+
+
+            <!-- Risk Display -->
+            <section class="panel">
+
+                <div class="px-5 py-4 border-b border-slate-800">
+
+                    <h2 class="text-sm font-semibold text-slate-100">
+                        Risk Display
+                    </h2>
+
+                    <p class="text-xs text-slate-500 mt-1">
+                        Configure how simulated risk scores are presented.
+                    </p>
+
+                </div>
+
+
+                <div class="p-5 space-y-5">
+
+                    <div>
+
+                        <label class="block text-xs text-slate-400 mb-2">
+                            Risk Scale
+                        </label>
+
+                        <select
+                            id="riskScale"
+                            class="w-full bg-slate-950 border border-slate-700 rounded-md px-3 py-2 text-xs text-slate-300 outline-none focus:border-cyan-500"
+                        >
+
+                            <option value="100">
+                                0 – 100
+                            </option>
+
+                            <option value="10">
+                                0 – 10
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div>
+
+                        <label class="block text-xs text-slate-400 mb-2">
+                            High Risk Threshold
+                        </label>
+
+                        <div class="flex items-center gap-3">
+
+                            <input
+                                id="riskThreshold"
+                                type="range"
+                                min="50"
+                                max="100"
+                                value="75"
+                                class="flex-1 accent-cyan-500"
+                            >
+
+                            <span
+                                id="riskThresholdValue"
+                                class="w-10 text-center text-xs font-semibold text-red-400"
+                            >
+                                75
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- Alert Display -->
+            <section class="panel">
+
+                <div class="px-5 py-4 border-b border-slate-800">
+
+                    <h2 class="text-sm font-semibold text-slate-100">
+                        Alert Display
+                    </h2>
+
+                    <p class="text-xs text-slate-500 mt-1">
+                        Configure simulated alert table behaviour.
+                    </p>
+
+                </div>
+
+
+                <div class="p-5 space-y-4">
+
+                    <label class="flex items-center justify-between gap-5 cursor-pointer">
+
+                        <div>
+
+                            <div class="text-xs font-medium text-slate-200">
+                                Auto Refresh Alerts
+                            </div>
+
+                            <p class="text-[11px] text-slate-500 mt-1">
+                                Simulate periodic refresh of alert information.
+                            </p>
+
+                        </div>
+
+                        <input
+                            id="autoRefresh"
+                            type="checkbox"
+                            class="w-4 h-4 accent-cyan-500"
+                        >
+
+                    </label>
+
+
+                    <div>
+
+                        <label class="block text-xs text-slate-400 mb-2">
+                            Alerts Per Page
+                        </label>
+
+                        <select
+                            id="alertsPerPage"
+                            class="w-full bg-slate-950 border border-slate-700 rounded-md px-3 py-2 text-xs text-slate-300 outline-none focus:border-cyan-500"
+                        >
+
+                            <option value="10">
+                                10
+                            </option>
+
+                            <option value="25">
+                                25
+                            </option>
+
+                            <option value="50">
+                                50
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- Notifications -->
+            <section class="panel">
+
+                <div class="px-5 py-4 border-b border-slate-800">
+
+                    <h2 class="text-sm font-semibold text-slate-100">
+                        Notifications
+                    </h2>
+
+                    <p class="text-xs text-slate-500 mt-1">
+                        Control frontend notification behaviour.
+                    </p>
+
+                </div>
+
+
+                <div class="p-5 space-y-4">
+
+                    <label class="flex items-center justify-between gap-5 cursor-pointer">
+
+                        <div>
+
+                            <div class="text-xs font-medium text-slate-200">
+                                Critical Alert Notifications
+                            </div>
+
+                            <p class="text-[11px] text-slate-500 mt-1">
+                                Show a toast when a simulated critical alert is detected.
+                            </p>
+
+                        </div>
+
+                        <input
+                            id="criticalNotifications"
+                            type="checkbox"
+                            checked
+                            class="w-4 h-4 accent-cyan-500"
+                        >
+
+                    </label>
+
+
+                    <label class="flex items-center justify-between gap-5 cursor-pointer">
+
+                        <div>
+
+                            <div class="text-xs font-medium text-slate-200">
+                                Investigation Updates
+                            </div>
+
+                            <p class="text-[11px] text-slate-500 mt-1">
+                                Show simulated investigation status updates.
+                            </p>
+
+                        </div>
+
+                        <input
+                            id="investigationNotifications"
+                            type="checkbox"
+                            checked
+                            class="w-4 h-4 accent-cyan-500"
+                        >
+
+                    </label>
+
+
+                    <label class="flex items-center justify-between gap-5 cursor-pointer">
+
+                        <div>
+
+                            <div class="text-xs font-medium text-slate-200">
+                                BLUF Report Notifications
+                            </div>
+
+                            <p class="text-[11px] text-slate-500 mt-1">
+                                Notify when a simulated BLUF report is generated.
+                            </p>
+
+                        </div>
+
+                        <input
+                            id="blufNotifications"
+                            type="checkbox"
+                            checked
+                            class="w-4 h-4 accent-cyan-500"
+                        >
+
+                    </label>
+
+                </div>
+
+            </section>
+
+
+            <!-- Save -->
+            <div class="flex justify-end gap-2">
+
+                <button
+                    onclick="resetSettings()"
+                    class="px-4 py-2 rounded-md border border-slate-700 bg-slate-900 text-xs text-slate-300 hover:text-slate-100"
+                >
+                    Reset
+                </button>
+
+                <button
+                    onclick="saveSettings()"
+                    class="px-5 py-2 rounded-md bg-cyan-500 hover:bg-cyan-400 text-xs font-semibold text-slate-950"
+                >
+                    Save Preferences
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- RIGHT -->
+        <div class="space-y-4">
+
+            <!-- System Status -->
+            <section class="panel">
+
+                <div class="px-5 py-4 border-b border-slate-800">
+
+                    <h2 class="text-sm font-semibold text-slate-100">
+                        Environment Status
+                    </h2>
+
+                </div>
+
+
+                <div class="p-5 space-y-4">
+
+                    <div class="flex items-center justify-between">
+
+                        <span class="text-xs text-slate-500">
+                            Environment
+                        </span>
+
+                        <span class="badge badge-amber">
+                            DEMO
+                        </span>
+
+                    </div>
+
+
+                    <div class="flex items-center justify-between">
+
+                        <span class="text-xs text-slate-500">
+                            Data Source
+                        </span>
+
+                        <span class="text-xs text-cyan-400">
+                            Simulated
+                        </span>
+
+                    </div>
+
+
+                    <div class="flex items-center justify-between">
+
+                        <span class="text-xs text-slate-500">
+                            Backend
+                        </span>
+
+                        <span class="text-xs text-slate-400">
+                            Not connected
+                        </span>
+
+                    </div>
+
+
+                    <div class="flex items-center justify-between">
+
+                        <span class="text-xs text-slate-500">
+                            SIEM
+                        </span>
+
+                        <span class="text-xs text-slate-400">
+                            Not connected
+                        </span>
+
+                    </div>
+
+
+                    <div class="flex items-center justify-between">
+
+                        <span class="text-xs text-slate-500">
+                            Network Sensors
+                        </span>
+
+                        <span class="text-xs text-slate-400">
+                            Not connected
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- Demo Information -->
+            <section class="panel border border-cyan-500/10">
+
+                <div class="px-5 py-4 border-b border-slate-800">
+
+                    <h2 class="text-sm font-semibold text-slate-100">
+                        Demo Information
+                    </h2>
+
+                </div>
+
+
+                <div class="p-5">
+
+                    <div class="flex items-start gap-3">
+
+                        <div class="w-8 h-8 rounded-md bg-cyan-500/10 text-cyan-400 flex items-center justify-center shrink-0">
+
+                            <svg class="w-4 h-4"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+
+                                <path stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      stroke-width="1.5"
+                                      d="M13 16h-1v-4h-1m1-4h.01M12 21a9 9 0 100-18 9 9 0 000 18z"/>
+
+                            </svg>
+
+                        </div>
+
+
+                        <div>
+
+                            <p class="text-xs text-slate-300 leading-5">
+                                ARES is currently operating as a frontend demonstration
+                                using simulated threat intelligence data.
+                            </p>
+
+                            <p class="text-[11px] text-slate-500 leading-5 mt-2">
+                                No real alerts, SIEM events, network traffic, authentication
+                                logs, or defence-system data are being collected.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- Architecture -->
+            <section class="panel">
+
+                <div class="px-5 py-4 border-b border-slate-800">
+
+                    <h2 class="text-sm font-semibold text-slate-100">
+                        Frontend Architecture
+                    </h2>
+
+                </div>
+
+
+                <div class="p-5 space-y-3">
+
+                    <div class="flex justify-between">
+
+                        <span class="text-xs text-slate-500">
+                            UI
+                        </span>
+
+                        <span class="text-xs text-slate-300">
+                            HTML + Tailwind
+                        </span>
+
+                    </div>
+
+
+                    <div class="flex justify-between">
+
+                        <span class="text-xs text-slate-500">
+                            Templates
+                        </span>
+
+                        <span class="text-xs text-slate-300">
+                            Jinja2
+                        </span>
+
+                    </div>
+
+
+                    <div class="flex justify-between">
+
+                        <span class="text-xs text-slate-500">
+                            Interactions
+                        </span>
+
+                        <span class="text-xs text-slate-300">
+                            Vanilla JS
+                        </span>
+
+                    </div>
+
+
+                    <div class="flex justify-between">
+
+                        <span class="text-xs text-slate-500">
+                            Charts
+                        </span>
+
+                        <span class="text-xs text-slate-300">
+                            Chart.js
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- Warning -->
+            <div class="p-4 rounded-lg border border-red-500/20 bg-red-500/5">
+
+                <div class="flex gap-3">
+
+                    <svg class="w-5 h-5 text-red-400 shrink-0"
+                         fill="none"
+                         stroke="currentColor"
+                         viewBox="0 0 24 24">
+
+                        <path stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="1.5"
+                              d="M12 9v2m0 4h.01M10.29 3.86l-7.82 13.5A2 2 0 004.2 20h15.6a2 2 0 001.73-2.64l-7.82-13.5a2 2 0 00-3.42 0z"/>
+
+                    </svg>
+
+
+                    <div>
+
+                        <div class="text-xs font-semibold text-red-400">
+                            Simulation Only
+                        </div>
+
+                        <p class="text-[11px] text-slate-500 mt-1 leading-5">
+                            Settings shown here do not configure real infrastructure
+                            or security systems.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+const settingsDefaults = {
+    theme: "dark",
+    compactMode: false,
+    showActivity: true,
+    showWorkload: true,
+    showQuickActions: true,
+    riskScale: "100",
+    riskThreshold: 75,
+    autoRefresh: false,
+    alertsPerPage: "10",
+    criticalNotifications: true,
+    investigationNotifications: true,
+    blufNotifications: true
+};
+
+
+function getSettings() {
+
+    return {
+        theme: document.getElementById("themeSelect").value,
+        compactMode: document.getElementById("compactMode").checked,
+        showActivity: document.getElementById("showActivity").checked,
+        showWorkload: document.getElementById("showWorkload").checked,
+        showQuickActions: document.getElementById("showQuickActions").checked,
+        riskScale: document.getElementById("riskScale").value,
+        riskThreshold: Number(document.getElementById("riskThreshold").value),
+        autoRefresh: document.getElementById("autoRefresh").checked,
+        alertsPerPage: document.getElementById("alertsPerPage").value,
+        criticalNotifications: document.getElementById("criticalNotifications").checked,
+        investigationNotifications: document.getElementById("investigationNotifications").checked,
+        blufNotifications: document.getElementById("blufNotifications").checked
+    };
+
+}
+
+
+function applySettings(settings) {
+
+    document.getElementById("themeSelect").value =
+        settings.theme;
+
+    document.getElementById("compactMode").checked =
+        settings.compactMode;
+
+    document.getElementById("showActivity").checked =
+        settings.showActivity;
+
+    document.getElementById("showWorkload").checked =
+        settings.showWorkload;
+
+    document.getElementById("showQuickActions").checked =
+        settings.showQuickActions;
+
+    document.getElementById("riskScale").value =
+        settings.riskScale;
+
+    document.getElementById("riskThreshold").value =
+        settings.riskThreshold;
+
+    document.getElementById("autoRefresh").checked =
+        settings.autoRefresh;
+
+    document.getElementById("alertsPerPage").value =
+        settings.alertsPerPage;
+
+    document.getElementById("criticalNotifications").checked =
+        settings.criticalNotifications;
+
+    document.getElementById("investigationNotifications").checked =
+        settings.investigationNotifications;
+
+    document.getElementById("blufNotifications").checked =
+        settings.blufNotifications;
+
+    updateRiskThresholdLabel();
+
+}
+
+
+function saveSettings() {
+
+    const settings = getSettings();
+
+    localStorage.setItem(
+        "aresSettings",
+        JSON.stringify(settings)
+    );
+
+    if (typeof showToast === "function") {
+
+        showToast(
+            "ARES preferences saved locally.",
+            "success"
+        );
+
+    }
+
+}
+
+
+function loadSettings() {
+
+    const saved =
+        localStorage.getItem("aresSettings");
+
+    if (!saved) {
+
+        applySettings(settingsDefaults);
+
+        return;
+    }
+
+    try {
+
+        const settings = {
+            ...settingsDefaults,
+            ...JSON.parse(saved)
+        };
+
+        applySettings(settings);
+
+    } catch (error) {
+
+        applySettings(settingsDefaults);
+
+    }
+
+}
+
+
+function resetSettings() {
+
+    applySettings(settingsDefaults);
+
+    localStorage.removeItem("aresSettings");
+
+    if (typeof showToast === "function") {
+
+        showToast(
+            "ARES preferences reset.",
+            "info"
+        );
+
+    }
+
+}
+
+
+function updateRiskThresholdLabel() {
+
+    const slider =
+        document.getElementById("riskThreshold");
+
+    const value =
+        document.getElementById("riskThresholdValue");
+
+    value.textContent =
+        slider.value;
+
+}
+
+
+document
+    .getElementById("riskThreshold")
+    .addEventListener(
+        "input",
+        updateRiskThresholdLabel
+    );
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    loadSettings
+);
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,2434 @@
+{% extends "base.html" %}
+
+{% block title %}
+ARES — Commander BLUF Reports
+{% endblock %}
+
+{% block page_title %}
+Commander BLUF Reports
+{% endblock %}
+
+{% block content %}
+
+
+
+
+<!-- =========================================================
+     HEADER
+     ========================================================= -->
+
+<div class="flex flex-col lg:flex-row justify-between gap-4 mb-6">
+
+    <div>
+
+        <p class="text-[9px] text-amber-400 tracking-widest">
+            COMMANDER REPORTING
+        </p>
+
+        <h2 class="text-xl font-semibold text-white mt-1">
+            Bottom Line Up Front Reports
+        </h2>
+
+        <p class="text-xs text-slate-500 mt-2 max-w-2xl">
+            Concise simulated threat summaries designed to give
+            commanders an immediate understanding of the situation,
+            impact, confidence and recommended actions.
+        </p>
+
+    </div>
+
+
+    <button
+        id="generateReportBtn"
+        class="
+            self-start
+            px-4
+            py-2.5
+            rounded-md
+            bg-amber-500
+            text-[#07101B]
+            text-xs
+            font-semibold
+            hover:bg-amber-400
+            transition
+        "
+    >
+        + Generate Simulated Report
+    </button>
+
+</div>
+
+
+<!-- =========================================================
+     STATISTICS
+     ========================================================= -->
+
+<div
+    class="
+        grid
+        grid-cols-1
+        sm:grid-cols-2
+        lg:grid-cols-4
+        gap-4
+        mb-6
+    "
+>
+
+    <div class="panel rounded-lg p-4">
+
+        <p class="text-[9px] text-slate-500 tracking-widest">
+            TOTAL REPORTS
+        </p>
+
+        <p
+            id="totalReports"
+            class="text-2xl font-bold text-slate-200 mt-2"
+        >
+            8
+        </p>
+
+        <p class="text-[10px] text-slate-600 mt-2">
+            Simulated reports
+        </p>
+
+    </div>
+
+
+    <div class="panel rounded-lg p-4">
+
+        <p class="text-[9px] text-slate-500 tracking-widest">
+            HIGH PRIORITY
+        </p>
+
+        <p
+            id="highPriorityReports"
+            class="text-2xl font-bold text-red-400 mt-2"
+        >
+            4
+        </p>
+
+        <p class="text-[10px] text-slate-600 mt-2">
+            Critical and high risk
+        </p>
+
+    </div>
+
+
+    <div class="panel rounded-lg p-4">
+
+        <p class="text-[9px] text-slate-500 tracking-widest">
+            PUBLISHED
+        </p>
+
+        <p
+            id="publishedReports"
+            class="text-2xl font-bold text-green-400 mt-2"
+        >
+            5
+        </p>
+
+        <p class="text-[10px] text-slate-600 mt-2">
+            Ready for command review
+        </p>
+
+    </div>
+
+
+    <div class="panel rounded-lg p-4">
+
+        <p class="text-[9px] text-slate-500 tracking-widest">
+            DRAFTS
+        </p>
+
+        <p
+            id="draftReports"
+            class="text-2xl font-bold text-amber-400 mt-2"
+        >
+            3
+        </p>
+
+        <p class="text-[10px] text-slate-600 mt-2">
+            Awaiting analyst review
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     SEARCH + FILTER
+     ========================================================= -->
+
+<div class="panel rounded-lg p-4 mb-5">
+
+    <div
+        class="
+            flex
+            flex-col
+            lg:flex-row
+            gap-3
+            lg:items-end
+        "
+    >
+
+        <div class="flex-1">
+
+            <label class="block text-[10px] text-slate-500 mb-2">
+                SEARCH REPORTS
+            </label>
+
+            <input
+                id="reportSearch"
+                type="text"
+                placeholder="Search report ID, title, threat or analyst..."
+                class="
+                    w-full
+                    bg-[#081321]
+                    border
+                    border-[#1C3048]
+                    rounded-md
+                    px-4
+                    py-2.5
+                    text-xs
+                    text-slate-200
+                    placeholder-slate-600
+                    outline-none
+                    focus:border-amber-500
+                "
+            >
+
+        </div>
+
+
+        <div class="w-full lg:w-44">
+
+            <label class="block text-[10px] text-slate-500 mb-2">
+                PRIORITY
+            </label>
+
+            <select
+                id="priorityFilter"
+                class="report-filter"
+            >
+
+                <option value="all">
+                    All Priorities
+                </option>
+
+                <option value="Critical">
+                    Critical
+                </option>
+
+                <option value="High">
+                    High
+                </option>
+
+                <option value="Medium">
+                    Medium
+                </option>
+
+                <option value="Low">
+                    Low
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="w-full lg:w-44">
+
+            <label class="block text-[10px] text-slate-500 mb-2">
+                STATUS
+            </label>
+
+            <select
+                id="statusFilter"
+                class="report-filter"
+            >
+
+                <option value="all">
+                    All Status
+                </option>
+
+                <option value="Published">
+                    Published
+                </option>
+
+                <option value="Draft">
+                    Draft
+                </option>
+
+                <option value="Reviewed">
+                    Reviewed
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <button
+            id="resetReportFilters"
+            class="
+                px-4
+                py-2.5
+                rounded-md
+                border
+                border-[#1C3048]
+                text-xs
+                text-slate-400
+                hover:text-amber-400
+                hover:border-amber-500
+            "
+        >
+            Reset
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     REPORT COUNT
+     ========================================================= -->
+
+<div class="flex justify-between items-center mb-4">
+
+    <div>
+
+        <p
+            id="reportResultCount"
+            class="text-xs text-slate-400"
+        >
+            Showing 8 simulated reports
+        </p>
+
+        <p class="text-[10px] text-slate-600 mt-1">
+            Reports contain simulated intelligence only.
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     REPORT GRID
+     ========================================================= -->
+
+<div
+    id="reportGrid"
+    class="
+        grid
+        grid-cols-1
+        xl:grid-cols-2
+        gap-5
+    "
+>
+</div>
+
+
+<!-- =========================================================
+     EMPTY STATE
+     ========================================================= -->
+
+<div
+    id="reportEmpty"
+    class="
+        hidden
+        panel
+        rounded-lg
+        py-16
+        text-center
+    "
+>
+
+    <div class="text-3xl text-slate-700">
+        ◌
+    </div>
+
+    <p class="text-sm text-slate-400 mt-3">
+        No reports match the selected filters.
+    </p>
+
+</div>
+
+
+<!-- =========================================================
+     REPORT DETAIL MODAL
+     ========================================================= -->
+
+<div
+    id="reportModal"
+    class="
+        fixed
+        inset-0
+        z-50
+        hidden
+        items-center
+        justify-center
+        bg-black/70
+        backdrop-blur-sm
+        p-4
+    "
+>
+
+    <div
+        class="
+            w-full
+            max-w-4xl
+            max-h-[92vh]
+            overflow-y-auto
+            bg-[#09111D]
+            border
+            border-[#1C3048]
+            rounded-xl
+            shadow-2xl
+        "
+    >
+
+        <!-- MODAL HEADER -->
+
+        <div
+            class="
+                flex
+                justify-between
+                items-start
+                gap-4
+                px-6
+                py-5
+                border-b
+                border-[#1C3048]
+            "
+        >
+
+            <div>
+
+                <p
+                    id="modalReportId"
+                    class="
+                        text-[9px]
+                        text-amber-400
+                        tracking-widest
+                    "
+                >
+                    BLUF-000
+                </p>
+
+                <h2
+                    id="modalReportTitle"
+                    class="
+                        text-lg
+                        font-semibold
+                        text-white
+                        mt-1
+                    "
+                >
+                    Report
+                </h2>
+
+                <p
+                    id="modalReportMeta"
+                    class="
+                        text-[10px]
+                        text-slate-500
+                        mt-2
+                    "
+                >
+                    —
+                </p>
+
+            </div>
+
+
+            <button
+                id="closeReportModal"
+                class="
+                    text-slate-500
+                    hover:text-white
+                    text-xl
+                "
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="p-6">
+
+            <!-- BOTTOM LINE -->
+
+            <section class="mb-6">
+
+                <div class="flex items-center gap-2 mb-3">
+
+                    <span class="section-dot bg-red-400"></span>
+
+                    <p class="report-section-title">
+                        BOTTOM LINE UP FRONT
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="modalBottomLine"
+                    class="
+                        p-5
+                        rounded-lg
+                        border
+                        border-red-500/20
+                        bg-red-500/5
+                        text-sm
+                        leading-7
+                        text-slate-200
+                    "
+                >
+                    —
+                </div>
+
+            </section>
+
+
+            <!-- THREAT OVERVIEW -->
+
+            <section class="mb-6">
+
+                <div class="flex items-center gap-2 mb-3">
+
+                    <span class="section-dot bg-cyan-400"></span>
+
+                    <p class="report-section-title">
+                        THREAT OVERVIEW
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="modalThreatOverview"
+                    class="
+                        text-xs
+                        leading-6
+                        text-slate-400
+                    "
+                >
+                    —
+                </div>
+
+            </section>
+
+
+            <!-- EVIDENCE -->
+
+            <section class="mb-6">
+
+                <div class="flex items-center gap-2 mb-3">
+
+                    <span class="section-dot bg-purple-400"></span>
+
+                    <p class="report-section-title">
+                        KEY EVIDENCE
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="modalEvidence"
+                    class="space-y-2"
+                >
+                </div>
+
+            </section>
+
+
+            <!-- MITRE + RISK -->
+
+            <div
+                class="
+                    grid
+                    grid-cols-1
+                    lg:grid-cols-2
+                    gap-5
+                    mb-6
+                "
+            >
+
+                <section>
+
+                    <div class="flex items-center gap-2 mb-3">
+
+                        <span class="section-dot bg-purple-400"></span>
+
+                        <p class="report-section-title">
+                            MITRE ATT&CK MAPPING
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        id="modalMitre"
+                        class="space-y-2"
+                    >
+                    </div>
+
+                </section>
+
+
+                <section>
+
+                    <div class="flex items-center gap-2 mb-3">
+
+                        <span class="section-dot bg-amber-400"></span>
+
+                        <p class="report-section-title">
+                            RISK ASSESSMENT
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        id="modalRisk"
+                        class="
+                            p-4
+                            rounded-lg
+                            bg-[#081321]
+                            border
+                            border-[#1C3048]
+                        "
+                    >
+                    </div>
+
+                </section>
+
+            </div>
+
+
+            <!-- RECOMMENDATIONS -->
+
+            <section>
+
+                <div class="flex items-center gap-2 mb-3">
+
+                    <span class="section-dot bg-green-400"></span>
+
+                    <p class="report-section-title">
+                        RECOMMENDED ACTIONS
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="modalRecommendations"
+                    class="space-y-2"
+                >
+                </div>
+
+            </section>
+
+
+            <!-- FOOTER NOTICE -->
+
+            <div
+                class="
+                    mt-6
+                    p-4
+                    rounded-lg
+                    border
+                    border-amber-500/20
+                    bg-amber-500/5
+                "
+            >
+
+                <p class="text-[10px] text-amber-400 font-semibold">
+                    SIMULATION NOTICE
+                </p>
+
+                <p class="text-[10px] text-slate-500 mt-1 leading-5">
+                    This BLUF report is generated from simulated
+                    intelligence data for demonstration purposes.
+                    It is not an operational intelligence product.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- MODAL FOOTER -->
+
+        <div
+            class="
+                px-6
+                py-4
+                border-t
+                border-[#1C3048]
+                flex
+                flex-wrap
+                justify-end
+                gap-2
+            "
+        >
+
+            <button
+                id="printReportBtn"
+                class="
+                    px-3
+                    py-2
+                    rounded-md
+                    border
+                    border-[#1C3048]
+                    text-[10px]
+                    text-slate-400
+                    hover:text-white
+                "
+            >
+                Print
+            </button>
+
+
+            <button
+                id="simulateExportBtn"
+                class="
+                    px-3
+                    py-2
+                    rounded-md
+                    border
+                    border-purple-500/30
+                    text-[10px]
+                    text-purple-400
+                    hover:border-purple-400
+                "
+            >
+                Export PDF
+            </button>
+
+
+            <button
+                id="reviewReportBtn"
+                class="
+                    px-3
+                    py-2
+                    rounded-md
+                    bg-green-500
+                    text-[#07101B]
+                    text-[10px]
+                    font-semibold
+                    hover:bg-green-400
+                "
+            >
+                Mark Reviewed
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<style>
+
+    .report-filter {
+
+        width: 100%;
+        background: #081321;
+        border: 1px solid #1C3048;
+        border-radius: 6px;
+        padding: 9px 12px;
+        color: #94A3B8;
+        font-size: 10px;
+        outline: none;
+
+    }
+
+
+    .report-filter:focus {
+        border-color: #F59E0B;
+    }
+
+
+    .report-card {
+
+        background: #0B1523;
+        border: 1px solid #1C3048;
+        border-radius: 10px;
+        overflow: hidden;
+        transition: all .2s ease;
+
+    }
+
+
+    .report-card:hover {
+
+        border-color: #334B67;
+        transform: translateY(-2px);
+
+    }
+
+
+    .report-section-title {
+
+        font-size: 9px;
+        color: #64748B;
+        letter-spacing: .1em;
+        font-weight: 600;
+
+    }
+
+
+    .section-dot {
+
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+
+    }
+
+
+    .evidence-item {
+
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 10px;
+        background: #081321;
+        border: 1px solid #1C3048;
+        border-radius: 6px;
+        font-size: 10px;
+        color: #94A3B8;
+        line-height: 1.5;
+
+    }
+
+
+    .evidence-number {
+
+        min-width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        background: #172337;
+        color: #64748B;
+        font-size: 8px;
+
+    }
+
+
+    .recommendation-item {
+
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 11px;
+        background: #081321;
+        border: 1px solid #1C3048;
+        border-radius: 6px;
+        font-size: 10px;
+        color: #94A3B8;
+        line-height: 1.5;
+
+    }
+
+
+    .recommendation-number {
+
+        min-width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        background: rgba(34, 197, 94, .08);
+        border: 1px solid rgba(34, 197, 94, .15);
+        color: #4ADE80;
+        font-size: 8px;
+
+    }
+
+
+    .mitre-tag {
+
+        display: inline-flex;
+        padding: 6px 8px;
+        border-radius: 5px;
+        background: rgba(168, 85, 247, .06);
+        border: 1px solid rgba(168, 85, 247, .15);
+        color: #C084FC;
+        font-size: 9px;
+
+    }
+
+</style>
+
+
+<script>
+
+/* =========================================================
+   BLUF REPORT DATA — loaded from GET /api/clusters
+   Each cluster is mapped to the shape the rendering code expects.
+   The "Generate BLUF" button fetches the real /api/clusters/{id}/bluf
+   endpoint for the selected cluster and opens the detail modal.
+   ========================================================= */
+
+let blufReports = [];   // populated by loadBlufReports() on DOMContentLoaded
+
+// ---------------------------------------------------------------------------
+// Map a CorrelatedCluster (from /api/clusters) to the local report shape.
+// Fields used by the existing renderReports() and openReport() functions:
+//   id, title, priority, status, threat, analyst, created, risk,
+//   bottomLine, overview, evidence, mitre, recommendations
+// ---------------------------------------------------------------------------
+function clusterToReport(cluster) {
+    const level = (cluster.risk_level || 'LOW').toUpperCase();
+    const priorityMap = { CRITICAL: 'Critical', HIGH: 'High', MEDIUM: 'Medium', LOW: 'Low', LIKELY_FALSE_POSITIVE: 'Low' };
+    const priority = priorityMap[level] || 'Low';
+
+    const techniques = (cluster.attack_techniques || []);
+    const techNames  = techniques.map(t => t.technique_name).filter(n => n && n !== 'Unclassified');
+    const mitre      = techniques.map(t => `${t.technique_id} — ${t.technique_name}`);
+    const threat     = techNames.length > 0 ? techNames[0] : 'Unclassified';
+
+    const basis      = (cluster.correlation_basis || []).join(', ') || 'indicator';
+    const alerts     = cluster.alerts || [];
+    const entities   = [...new Set(alerts.map(a => a.entity).filter(Boolean))];
+
+    return {
+        id:          'BLUF-' + cluster.cluster_id,
+        cluster_id:  cluster.cluster_id,
+        title:       threat !== 'Unclassified' ? threat + ' — ' + (entities[0] || cluster.cluster_id) : 'Cluster ' + cluster.cluster_id,
+        priority:    priority,
+        status:      'Published',
+        threat:      threat,
+        analyst:     'ARES Engine',
+        created:     'Just now',
+        risk:        cluster.risk_score || 0,
+        bottomLine:  `Cluster ${cluster.cluster_id}: ${level} risk (score ${cluster.risk_score}/100). Correlation basis: ${basis}.`,
+        overview:    `${alerts.length} alert(s) correlated by ${basis}. Confidence: ${Math.round((cluster.confidence || 0) * 100)}%. Techniques identified: ${mitre.length > 0 ? mitre.join('; ') : 'none'}.`,
+        evidence:    alerts.slice(0, 8).map(a => `[${a.source}] ${a.title}`),
+        mitre:       mitre.length > 0 ? mitre : ['No techniques mapped'],
+        recommendations: [
+            cluster.risk_score >= 80 ? 'Immediate isolation and incident response.' :
+            cluster.risk_score >= 60 ? 'Escalate to SOC lead for investigation.' :
+            cluster.risk_score >= 40 ? 'Monitor and log for pattern recurrence.' :
+                                       'Review during next scheduled triage.'
+        ]
+    };
+}
+
+// ---------------------------------------------------------------------------
+// Fetch /api/clusters, build the reports array, then kick off the existing
+// renderReports() / updateStatistics() flow.
+// ---------------------------------------------------------------------------
+async function loadBlufReports() {
+    try {
+        const res = await fetch('/api/clusters');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const clusters = await res.json();
+        blufReports = clusters
+            .sort((a, b) => b.risk_score - a.risk_score)
+            .map(clusterToReport);
+    } catch (err) {
+        console.warn('Failed to load clusters for BLUF page:', err);
+        blufReports = [];
+    }
+    // Seed the filtered list and render
+    filteredReports = [...blufReports];
+    if (typeof renderReports    === 'function') renderReports();
+    if (typeof updateStatistics === 'function') updateStatistics();
+}
+
+// ---------------------------------------------------------------------------
+// Fetch the real BLUF from /api/clusters/{cluster_id}/bluf and open modal.
+// Falls back to the pre-built report object if the LLM call fails.
+// ---------------------------------------------------------------------------
+async function generateAndOpenBLUF(clusterId, fallbackReport) {
+    try {
+        const res = await fetch('/api/clusters/' + encodeURIComponent(clusterId) + '/bluf');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const bluf = await res.json();
+        // Merge the real LLM fields into the fallback shape and open
+        const enriched = Object.assign({}, fallbackReport, {
+            bottomLine:      bluf.bottom_line      || fallbackReport.bottomLine,
+            overview:        bluf.threat_classification + ' — ' + (bluf.recommended_action || ''),
+            evidence:        bluf.supporting_evidence || fallbackReport.evidence,
+            recommendations: [bluf.recommended_action].filter(Boolean),
+            mitre:           (bluf.attack_techniques_summary || fallbackReport.mitre),
+        });
+        // Temporarily replace in blufReports so openReport() finds it
+        const idx = blufReports.findIndex(r => r.id === fallbackReport.id);
+        if (idx >= 0) blufReports[idx] = enriched;
+        openReport(fallbackReport.id);
+    } catch (err) {
+        console.warn('BLUF generation failed, opening fallback:', err);
+        openReport(fallbackReport.id);
+    }
+}
+
+
+/* ========= LEGACY MOCK DATA REMOVED — replaced with API fetch above ========= */
+
+const _blufReports_REMOVED = [
+
+    {
+        id: "BLUF-2401",
+        title: "Suspected Credential Compromise — FIN-WS-042",
+        priority: "Critical",
+        status: "Published",
+        threat: "Credential compromise",
+        analyst: "A. Sharma",
+        created: "18 minutes ago",
+        risk: 94,
+
+        bottomLine:
+            "A high-confidence simulated credential compromise was identified on FIN-WS-042. Multiple authentication anomalies, credential-access indicators and suspicious PowerShell activity were correlated into a single investigation. Immediate account containment and endpoint review are recommended.",
+
+        overview:
+            "The activity indicates a simulated attack chain beginning with anomalous authentication followed by suspicious endpoint execution. Correlation across authentication, endpoint and network telemetry significantly increases confidence that the events represent a coordinated activity sequence.",
+
+        evidence: [
+            "Seven failed authentication attempts were followed by a successful login from an unusual workstation.",
+            "PowerShell execution occurred shortly after the successful authentication.",
+            "Credential-access indicators were observed on the same endpoint.",
+            "Network telemetry identified suspicious outbound communication."
+        ],
+
+        mitre: [
+            "T1059.001 — PowerShell",
+            "T1078 — Valid Accounts",
+            "T1110 — Brute Force",
+            "T1003 — OS Credential Dumping"
+        ],
+
+        recommendations: [
+            "Temporarily disable the affected demonstration account.",
+            "Isolate FIN-WS-042 from simulated network activity.",
+            "Review authentication history for related accounts.",
+            "Continue monitoring correlated indicators."
+        ]
+    },
+
+
+    {
+        id: "BLUF-2402",
+        title: "Suspicious Network Scanning Activity",
+        priority: "High",
+        status: "Published",
+        threat: "Network reconnaissance",
+        analyst: "R. Patel",
+        created: "42 minutes ago",
+        risk: 82,
+
+        bottomLine:
+            "Simulated network reconnaissance was detected across multiple internal assets. The activity is consistent with automated service discovery and has been correlated with suspicious authentication events.",
+
+        overview:
+            "Network sensor alerts show repeated connection attempts across a range of internal ports. Several targeted assets subsequently generated authentication anomalies.",
+
+        evidence: [
+            "Repeated connection attempts across multiple internal ports.",
+            "Scanning activity originated from a single simulated source.",
+            "Authentication anomalies occurred on two targeted systems.",
+            "Activity persisted across multiple observation windows."
+        ],
+
+        mitre: [
+            "T1046 — Network Service Scanning",
+            "T1078 — Valid Accounts"
+        ],
+
+        recommendations: [
+            "Review the source endpoint generating the scanning activity.",
+            "Validate whether the observed connections are expected.",
+            "Monitor targeted assets for follow-on activity."
+        ]
+    },
+
+
+    {
+        id: "BLUF-2403",
+        title: "Potential Command-and-Control Communication",
+        priority: "High",
+        status: "Reviewed",
+        threat: "Command and control",
+        analyst: "N. Mehta",
+        created: "1 hour ago",
+        risk: 79,
+
+        bottomLine:
+            "Simulated endpoint traffic shows indicators consistent with command-and-control communication. The activity was correlated with suspicious PowerShell execution and external DNS requests.",
+
+        overview:
+            "Network and endpoint telemetry indicate a possible relationship between suspicious script execution and repeated outbound communication patterns.",
+
+        evidence: [
+            "Repeated outbound HTTP requests to a simulated external destination.",
+            "DNS requests occurred immediately after script execution.",
+            "Endpoint telemetry recorded suspicious process creation.",
+            "The activity was observed across two simulated time windows."
+        ],
+
+        mitre: [
+            "T1071.001 — Web Protocols",
+            "T1071.004 — DNS",
+            "T1059.001 — PowerShell"
+        ],
+
+        recommendations: [
+            "Review the affected endpoint process tree.",
+            "Inspect simulated DNS and HTTP indicators.",
+            "Continue monitoring for repeated communication."
+        ]
+    },
+
+
+    {
+        id: "BLUF-2404",
+        title: "Possible Credential Brute Force Campaign",
+        priority: "Critical",
+        status: "Published",
+        threat: "Credential attack",
+        analyst: "S. Shah",
+        created: "2 hours ago",
+        risk: 91,
+
+        bottomLine:
+            "A coordinated simulated brute-force campaign targeted multiple user accounts. The attack generated a high volume of failed authentication attempts followed by successful access against one account.",
+
+        overview:
+            "Authentication telemetry shows concentrated failed-login activity across several accounts. One account subsequently produced a successful login, increasing the priority of the investigation.",
+
+        evidence: [
+            "More than 100 simulated failed authentication events were correlated.",
+            "Multiple user accounts were targeted from a common source.",
+            "One account generated a successful authentication after repeated failures.",
+            "The successful account generated subsequent endpoint activity."
+        ],
+
+        mitre: [
+            "T1110 — Brute Force",
+            "T1078 — Valid Accounts"
+        ],
+
+        recommendations: [
+            "Review the affected account immediately.",
+            "Reset simulated credentials if compromise is confirmed.",
+            "Review authentication activity for related accounts."
+        ]
+    },
+
+
+    {
+        id: "BLUF-2405",
+        title: "Suspicious Scheduled Task Creation",
+        priority: "Medium",
+        status: "Draft",
+        threat: "Persistence",
+        analyst: "K. Joshi",
+        created: "3 hours ago",
+        risk: 64,
+
+        bottomLine:
+            "A simulated scheduled task was created on an endpoint following suspicious process execution. The behaviour may represent persistence, although additional analyst validation is required.",
+
+        overview:
+            "Endpoint telemetry indicates the creation of a new scheduled task shortly after an unusual process launch.",
+
+        evidence: [
+            "New scheduled task observed on a demonstration endpoint.",
+            "Task creation followed suspicious process execution.",
+            "No additional confirmed persistence indicators were identified."
+        ],
+
+        mitre: [
+            "T1053 — Scheduled Task/Job"
+        ],
+
+        recommendations: [
+            "Validate whether the scheduled task is authorised.",
+            "Review the process responsible for task creation.",
+            "Escalate if additional persistence indicators appear."
+        ]
+    },
+
+
+    {
+        id: "BLUF-2406",
+        title: "Suspicious File Transfer Activity",
+        priority: "Medium",
+        status: "Reviewed",
+        threat: "Tool transfer",
+        analyst: "A. Sharma",
+        created: "5 hours ago",
+        risk: 59,
+
+        bottomLine:
+            "A simulated endpoint transferred a suspicious executable from an external location. The event was correlated with unusual process activity but currently has moderate confidence.",
+
+        overview:
+            "The simulated endpoint downloaded a file shortly after establishing an unusual external connection.",
+
+        evidence: [
+            "Executable file transfer detected.",
+            "Transfer originated from a simulated external destination.",
+            "Endpoint process execution followed the transfer."
+        ],
+
+        mitre: [
+            "T1105 — Ingress Tool Transfer"
+        ],
+
+        recommendations: [
+            "Review the transferred file metadata.",
+            "Validate the source destination.",
+            "Monitor the endpoint for additional activity."
+        ]
+    },
+
+
+    {
+        id: "BLUF-2407",
+        title: "Potential Data Exfiltration Path",
+        priority: "High",
+        status: "Draft",
+        threat: "Exfiltration",
+        analyst: "R. Patel",
+        created: "7 hours ago",
+        risk: 76,
+
+        bottomLine:
+            "Simulated outbound traffic suggests a possible data-exfiltration path through an existing command-and-control channel. The evidence requires additional validation before escalation.",
+
+        overview:
+            "Network activity showed an unusual outbound transfer pattern associated with an already monitored communication channel.",
+
+        evidence: [
+            "Outbound data volume exceeded the simulated baseline.",
+            "Traffic used an existing suspicious communication path.",
+            "The activity was associated with a previously investigated endpoint."
+        ],
+
+        mitre: [
+            "T1041 — Exfiltration Over C2 Channel"
+        ],
+
+        recommendations: [
+            "Review the affected endpoint and destination.",
+            "Validate the simulated data-transfer volume.",
+            "Correlate with previous investigation activity."
+        ]
+    },
+
+
+    {
+        id: "BLUF-2408",
+        title: "User Execution of Suspicious Content",
+        priority: "Low",
+        status: "Draft",
+        threat: "User execution",
+        analyst: "N. Mehta",
+        created: "9 hours ago",
+        risk: 42,
+
+        bottomLine:
+            "A simulated user executed suspicious content from an external source. Current evidence is insufficient to establish malicious intent, so the activity remains under analyst review.",
+
+        overview:
+            "Endpoint telemetry indicates user interaction with a suspicious file followed by process execution.",
+
+        evidence: [
+            "Suspicious file opened by a demonstration user.",
+            "Process execution followed the user interaction.",
+            "No confirmed lateral movement or persistence was identified."
+        ],
+
+        mitre: [
+            "T1204 — User Execution"
+        ],
+
+        recommendations: [
+            "Review the file origin.",
+            "Validate whether the user action was authorised.",
+            "Continue monitoring for follow-on activity."
+        ]
+    }
+
+];
+/* ======= END LEGACY MOCK DATA ======= */
+
+
+// filteredReports starts empty; loadBlufReports() populates it async on load
+let filteredReports = [];
+
+let currentReport =
+    null;
+
+
+/* =========================================================
+   ELEMENTS
+   ========================================================= */
+
+const reportGrid =
+    document.getElementById(
+        "reportGrid"
+    );
+
+const reportSearch =
+    document.getElementById(
+        "reportSearch"
+    );
+
+const priorityFilter =
+    document.getElementById(
+        "priorityFilter"
+    );
+
+const statusFilter =
+    document.getElementById(
+        "statusFilter"
+    );
+
+
+/* =========================================================
+   PRIORITY STYLES
+   ========================================================= */
+
+function priorityStyle(
+    priority
+) {
+
+    const styles = {
+
+        Critical:
+            "bg-red-500/10 text-red-400 border-red-500/20",
+
+        High:
+            "bg-orange-500/10 text-orange-400 border-orange-500/20",
+
+        Medium:
+            "bg-amber-500/10 text-amber-400 border-amber-500/20",
+
+        Low:
+            "bg-slate-500/10 text-slate-400 border-slate-500/20"
+
+    };
+
+
+    return styles[priority] ||
+        styles.Low;
+
+}
+
+
+/* =========================================================
+   STATUS STYLES
+   ========================================================= */
+
+function statusStyle(
+    status
+) {
+
+    const styles = {
+
+        Published:
+            "bg-green-500/10 text-green-400 border-green-500/20",
+
+        Reviewed:
+            "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
+
+        Draft:
+            "bg-amber-500/10 text-amber-400 border-amber-500/20"
+
+    };
+
+
+    return styles[status] ||
+        styles.Draft;
+
+}
+
+
+/* =========================================================
+   RENDER REPORTS
+   ========================================================= */
+
+function renderReports() {
+
+    reportGrid.innerHTML = "";
+
+
+    const empty =
+        document.getElementById(
+            "reportEmpty"
+        );
+
+
+    if (
+        filteredReports.length === 0
+    ) {
+
+        empty.classList.remove(
+            "hidden"
+        );
+
+    }
+
+    else {
+
+        empty.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    filteredReports.forEach(
+        function (report) {
+
+            const card =
+                document.createElement(
+                    "article"
+                );
+
+
+            card.className =
+                "report-card";
+
+
+            card.innerHTML = `
+
+                <!-- CARD HEADER -->
+
+                <div
+                    class="
+                        px-5
+                        py-4
+                        border-b
+                        border-[#1C3048]
+                    "
+                >
+
+                    <div
+                        class="
+                            flex
+                            items-start
+                            justify-between
+                            gap-3
+                        "
+                    >
+
+                        <div>
+
+                            <p
+                                class="
+                                    text-[9px]
+                                    text-amber-400
+                                    tracking-widest
+                                "
+                            >
+                                ${report.id}
+                            </p>
+
+                            <h3
+                                class="
+                                    text-sm
+                                    font-semibold
+                                    text-white
+                                    mt-1
+                                "
+                            >
+                                ${report.title}
+                            </h3>
+
+                        </div>
+
+
+                        <span
+                            class="
+                                px-2
+                                py-1
+                                rounded
+                                border
+                                text-[8px]
+                                whitespace-nowrap
+                                ${priorityStyle(
+                                    report.priority
+                                )}
+                            "
+                        >
+                            ${report.priority.toUpperCase()}
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        class="
+                            flex
+                            flex-wrap
+                            gap-2
+                            mt-3
+                        "
+                    >
+
+                        <span
+                            class="
+                                px-2
+                                py-1
+                                rounded
+                                border
+                                text-[8px]
+                                ${statusStyle(
+                                    report.status
+                                )}
+                            "
+                        >
+                            ${report.status}
+                        </span>
+
+
+                        <span
+                            class="
+                                px-2
+                                py-1
+                                rounded
+                                border
+                                border-[#1C3048]
+                                text-[8px]
+                                text-slate-500
+                            "
+                        >
+                            ${report.threat}
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- BOTTOM LINE -->
+
+                <div class="p-5">
+
+                    <p
+                        class="
+                            text-[9px]
+                            text-slate-600
+                            tracking-widest
+                            mb-2
+                        "
+                    >
+                        BOTTOM LINE UP FRONT
+                    </p>
+
+                    <p
+                        class="
+                            text-[11px]
+                            leading-5
+                            text-slate-300
+                        "
+                    >
+                        ${report.bottomLine}
+                    </p>
+
+
+                    <!-- METRICS -->
+
+                    <div
+                        class="
+                            grid
+                            grid-cols-3
+                            gap-2
+                            mt-5
+                        "
+                    >
+
+                        <div
+                            class="
+                                bg-[#081321]
+                                border
+                                border-[#1C3048]
+                                rounded-md
+                                p-3
+                            "
+                        >
+
+                            <p class="text-[8px] text-slate-600">
+                                RISK
+                            </p>
+
+                            <p
+                                class="
+                                    text-sm
+                                    font-bold
+                                    mt-1
+                                    ${
+                                        report.risk >= 85
+                                        ? "text-red-400"
+                                        : report.risk >= 65
+                                        ? "text-amber-400"
+                                        : "text-green-400"
+                                    }
+                                "
+                            >
+                                ${report.risk}
+                            </p>
+
+                        </div>
+
+
+                        <div
+                            class="
+                                bg-[#081321]
+                                border
+                                border-[#1C3048]
+                                rounded-md
+                                p-3
+                            "
+                        >
+
+                            <p class="text-[8px] text-slate-600">
+                                ANALYST
+                            </p>
+
+                            <p
+                                class="
+                                    text-[10px]
+                                    text-slate-300
+                                    mt-2
+                                "
+                            >
+                                ${report.analyst}
+                            </p>
+
+                        </div>
+
+
+                        <div
+                            class="
+                                bg-[#081321]
+                                border
+                                border-[#1C3048]
+                                rounded-md
+                                p-3
+                            "
+                        >
+
+                            <p class="text-[8px] text-slate-600">
+                                CREATED
+                            </p>
+
+                            <p
+                                class="
+                                    text-[10px]
+                                    text-slate-300
+                                    mt-2
+                                "
+                            >
+                                ${report.created}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CARD FOOTER -->
+
+                <div
+                    class="
+                        px-5
+                        py-3
+                        border-t
+                        border-[#1C3048]
+                        flex
+                        justify-between
+                        items-center
+                    "
+                >
+
+                    <span
+                        class="
+                            text-[8px]
+                            text-slate-600
+                        "
+                    >
+                        SIMULATED INTELLIGENCE
+                    </span>
+
+
+                    <button
+                        data-report-id="${report.id}"
+                        class="
+                            px-3
+                            py-1.5
+                            rounded
+                            border
+                            border-[#1C3048]
+                            text-[9px]
+                            text-slate-400
+                            hover:text-amber-400
+                            hover:border-amber-500
+                        "
+                    >
+                        Open Report
+                    </button>
+
+                </div>
+
+            `;
+
+
+            reportGrid.appendChild(
+                card
+            );
+
+        }
+    );
+
+
+    document
+        .getElementById(
+            "reportResultCount"
+        )
+        .textContent =
+        `Showing ${filteredReports.length} simulated reports`;
+
+
+    updateStatistics();
+
+}
+
+
+/* =========================================================
+   UPDATE STATISTICS
+   ========================================================= */
+
+function updateStatistics() {
+
+    document
+        .getElementById(
+            "totalReports"
+        )
+        .textContent =
+        blufReports.length;
+
+
+    document
+        .getElementById(
+            "highPriorityReports"
+        )
+        .textContent =
+        blufReports.filter(
+            report =>
+                report.priority === "Critical" ||
+                report.priority === "High"
+        ).length;
+
+
+    document
+        .getElementById(
+            "publishedReports"
+        )
+        .textContent =
+        blufReports.filter(
+            report =>
+                report.status === "Published"
+        ).length;
+
+
+    document
+        .getElementById(
+            "draftReports"
+        )
+        .textContent =
+        blufReports.filter(
+            report =>
+                report.status === "Draft"
+        ).length;
+
+}
+
+
+/* =========================================================
+   FILTERING
+   ========================================================= */
+
+function applyReportFilters() {
+
+    const search =
+        reportSearch.value
+            .trim()
+            .toLowerCase();
+
+
+    const priority =
+        priorityFilter.value;
+
+
+    const status =
+        statusFilter.value;
+
+
+    filteredReports =
+        blufReports.filter(
+            function (report) {
+
+                const searchable = [
+
+                    report.id,
+                    report.title,
+                    report.threat,
+                    report.analyst,
+                    report.bottomLine,
+                    report.overview
+
+                ]
+                    .join(" ")
+                    .toLowerCase();
+
+
+                const matchesSearch =
+                    !search ||
+                    searchable.includes(
+                        search
+                    );
+
+
+                const matchesPriority =
+                    priority === "all" ||
+                    report.priority === priority;
+
+
+                const matchesStatus =
+                    status === "all" ||
+                    report.status === status;
+
+
+                return (
+                    matchesSearch &&
+                    matchesPriority &&
+                    matchesStatus
+                );
+
+            }
+        );
+
+
+    renderReports();
+
+}
+
+
+reportSearch.addEventListener(
+    "input",
+    applyReportFilters
+);
+
+priorityFilter.addEventListener(
+    "change",
+    applyReportFilters
+);
+
+statusFilter.addEventListener(
+    "change",
+    applyReportFilters
+);
+
+
+/* =========================================================
+   RESET FILTERS
+   ========================================================= */
+
+document
+    .getElementById(
+        "resetReportFilters"
+    )
+    .addEventListener(
+        "click",
+        function () {
+
+            reportSearch.value = "";
+
+            priorityFilter.value =
+                "all";
+
+            statusFilter.value =
+                "all";
+
+            applyReportFilters();
+
+        }
+    );
+
+
+/* =========================================================
+   OPEN REPORT
+   ========================================================= */
+
+reportGrid.addEventListener(
+    "click",
+    function (event) {
+
+        const button =
+            event.target.closest(
+                "[data-report-id]"
+            );
+
+
+        if (!button) {
+            return;
+        }
+
+
+        openReport(
+            button.dataset.reportId
+        );
+
+    }
+);
+
+
+/* =========================================================
+   OPEN REPORT MODAL
+   ========================================================= */
+
+function openReport(id) {
+
+    const report =
+        blufReports.find(
+            item =>
+                item.id === id
+        );
+
+
+    if (!report) {
+        return;
+    }
+
+
+    currentReport =
+        report;
+
+
+    document
+        .getElementById(
+            "modalReportId"
+        )
+        .textContent =
+        report.id;
+
+
+    document
+        .getElementById(
+            "modalReportTitle"
+        )
+        .textContent =
+        report.title;
+
+
+    document
+        .getElementById(
+            "modalReportMeta"
+        )
+        .textContent =
+        `${report.priority} Priority • ${report.status} • Analyst: ${report.analyst} • ${report.created}`;
+
+
+    document
+        .getElementById(
+            "modalBottomLine"
+        )
+        .textContent =
+        report.bottomLine;
+
+
+    document
+        .getElementById(
+            "modalThreatOverview"
+        )
+        .textContent =
+        report.overview;
+
+
+    document
+        .getElementById(
+            "modalEvidence"
+        )
+        .innerHTML =
+        report.evidence
+            .map(
+                function (item, index) {
+
+                    return `
+                        <div class="evidence-item">
+
+                            <span class="evidence-number">
+                                ${index + 1}
+                            </span>
+
+                            <span>
+                                ${item}
+                            </span>
+
+                        </div>
+                    `;
+
+                }
+            )
+            .join("");
+
+
+    document
+        .getElementById(
+            "modalMitre"
+        )
+        .innerHTML =
+        report.mitre
+            .map(
+                item =>
+                `
+                    <span class="mitre-tag">
+                        ${item}
+                    </span>
+                `
+            )
+            .join("");
+
+
+    document
+        .getElementById(
+            "modalRisk"
+        )
+        .innerHTML = `
+
+            <div
+                class="
+                    flex
+                    items-center
+                    justify-between
+                "
+            >
+
+                <span class="text-[10px] text-slate-500">
+                    SIMULATED RISK SCORE
+                </span>
+
+                <span
+                    class="
+                        text-2xl
+                        font-bold
+                        ${
+                            report.risk >= 85
+                            ? "text-red-400"
+                            : report.risk >= 65
+                            ? "text-amber-400"
+                            : "text-green-400"
+                        }
+                    "
+                >
+                    ${report.risk}
+                </span>
+
+            </div>
+
+
+            <div
+                class="
+                    h-2
+                    bg-[#162337]
+                    rounded-full
+                    mt-4
+                    overflow-hidden
+                "
+            >
+
+                <div
+                    class="
+                        h-full
+                        rounded-full
+                        ${
+                            report.risk >= 85
+                            ? "bg-red-500"
+                            : report.risk >= 65
+                            ? "bg-amber-500"
+                            : "bg-green-500"
+                        }
+                    "
+                    style="
+                        width:${report.risk}%
+                    "
+                ></div>
+
+            </div>
+
+
+            <div
+                class="
+                    flex
+                    justify-between
+                    mt-2
+                    text-[8px]
+                    text-slate-600
+                "
+            >
+
+                <span>LOW</span>
+
+                <span>MEDIUM</span>
+
+                <span>HIGH</span>
+
+            </div>
+
+        `;
+
+
+    document
+        .getElementById(
+            "modalRecommendations"
+        )
+        .innerHTML =
+        report.recommendations
+            .map(
+                function (item, index) {
+
+                    return `
+                        <div class="recommendation-item">
+
+                            <span class="recommendation-number">
+                                ${index + 1}
+                            </span>
+
+                            <span>
+                                ${item}
+                            </span>
+
+                        </div>
+                    `;
+
+                }
+            )
+            .join("");
+
+
+    const modal =
+        document.getElementById(
+            "reportModal"
+        );
+
+
+    modal.classList.remove(
+        "hidden"
+    );
+
+    modal.classList.add(
+        "flex"
+    );
+
+}
+
+
+/* =========================================================
+   CLOSE REPORT MODAL
+   ========================================================= */
+
+function closeReport() {
+
+    const modal =
+        document.getElementById(
+            "reportModal"
+        );
+
+
+    modal.classList.add(
+        "hidden"
+    );
+
+    modal.classList.remove(
+        "flex"
+    );
+
+}
+
+
+document
+    .getElementById(
+        "closeReportModal"
+    )
+    .addEventListener(
+        "click",
+        closeReport
+    );
+
+
+document
+    .getElementById(
+        "reportModal"
+    )
+    .addEventListener(
+        "click",
+        function (event) {
+
+            if (
+                event.target === this
+            ) {
+
+                closeReport();
+
+            }
+
+        }
+    );
+
+
+/* =========================================================
+   MARK REVIEWED
+   ========================================================= */
+
+document
+    .getElementById(
+        "reviewReportBtn"
+    )
+    .addEventListener(
+        "click",
+        function () {
+
+            if (!currentReport) {
+                return;
+            }
+
+
+            currentReport.status =
+                "Reviewed";
+
+
+            applyReportFilters();
+
+
+            if (
+                typeof showToast ===
+                "function"
+            ) {
+
+                showToast(
+                    "Report marked as reviewed",
+                    "success"
+                );
+
+            }
+
+
+            closeReport();
+
+        }
+    );
+
+
+/* =========================================================
+   SIMULATED PDF EXPORT
+   ========================================================= */
+
+document
+    .getElementById(
+        "simulateExportBtn"
+    )
+    .addEventListener(
+        "click",
+        function () {
+
+            if (!currentReport) {
+                return;
+            }
+
+
+            if (
+                typeof showToast ===
+                "function"
+            ) {
+
+                showToast(
+                    `Simulated PDF export prepared for ${currentReport.id}`,
+                    "info"
+                );
+
+            }
+
+        }
+    );
+
+
+/* =========================================================
+   PRINT
+   ========================================================= */
+
+document
+    .getElementById(
+        "printReportBtn"
+    )
+    .addEventListener(
+        "click",
+        function () {
+
+            if (!currentReport) {
+                return;
+            }
+
+
+            window.print();
+
+        }
+    );
+
+
+/* =========================================================
+   GENERATE SIMULATED REPORT
+   ========================================================= */
+
+document
+    .getElementById(
+        "generateReportBtn"
+    )
+    .addEventListener(
+        "click",
+        function () {
+
+            const newId =
+                `BLUF-${2409 + blufReports.length}`;
+
+
+            const newReport = {
+
+                id: newId,
+
+                title:
+                    "Simulated Correlated Threat Summary",
+
+                priority: "High",
+
+                status: "Draft",
+
+                threat:
+                    "Multi-source correlation",
+
+                analyst:
+                    "Demo Analyst",
+
+                created:
+                    "Just now",
+
+                risk: 81,
+
+                bottomLine:
+                    "ARES generated a simulated BLUF report from a newly correlated group of security alerts. Analyst validation is required before this report can be considered reviewed.",
+
+                overview:
+                    "Multiple simulated alerts were correlated based on common assets, timestamps, indicators and behavioural patterns.",
+
+                evidence: [
+
+                    "Multiple simulated sources contributed related alerts.",
+
+                    "Events occurred within a common observation window.",
+
+                    "Correlation increased the confidence of the simulated investigation."
+
+                ],
+
+                mitre: [
+
+                    "T1059.001 — PowerShell",
+
+                    "T1078 — Valid Accounts"
+
+                ],
+
+                recommendations: [
+
+                    "Review the correlated alert cluster.",
+
+                    "Validate the affected simulated assets.",
+
+                    "Confirm the MITRE ATT&CK mapping."
+
+                ]
+
+            };
+
+
+            blufReports.unshift(
+                newReport
+            );
+
+
+            applyReportFilters();
+
+
+            if (
+                typeof showToast ===
+                "function"
+            ) {
+
+                showToast(
+                    `${newId} generated using simulated data`,
+                    "success"
+                );
+
+            }
+
+
+            openReport(
+                newId
+            );
+
+        }
+    );
+
+
+/* =========================================================
+   ESCAPE KEY
+   ========================================================= */
+
+document.addEventListener(
+    "keydown",
+    function (event) {
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            closeReport();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   INITIAL RENDER — replaced with API fetch
+   ========================================================= */
+
+// Load real cluster data from the API; renderReports() and updateStatistics()
+// are called inside loadBlufReports() once the data is ready.
+loadBlufReports();
+
+</script>
+
+{% endblock %}

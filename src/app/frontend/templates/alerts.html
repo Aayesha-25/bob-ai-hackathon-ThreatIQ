@@ -1,0 +1,836 @@
+ {% extends "base.html" %}
+
+{% block title %}
+Alert Intelligence | ARES
+{% endblock %}
+
+{% block page_title %}
+Alert Intelligence
+{% endblock %}
+
+{% block content %}
+
+<div class="space-y-6">
+
+```
+<!-- Page Header -->
+<div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+
+    <div>
+        <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-400">
+            Correlation Engine
+        </p>
+
+        <h1 class="mt-1 text-2xl font-bold tracking-tight text-white">
+            Alert Intelligence
+        </h1>
+
+        <p class="mt-2 max-w-3xl text-sm text-slate-400">
+            Correlated security events grouped by shared indicators and entities.
+            Expand a cluster to inspect its member alerts and supporting intelligence.
+        </p>
+    </div>
+
+    <div class="flex items-center gap-2">
+        <span class="rounded-md border border-cyan-500/20 bg-cyan-500/10 px-3 py-1.5 text-xs font-semibold text-cyan-300">
+            SIMULATED DATA
+        </span>
+
+        <span class="rounded-md border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-400">
+            PIPELINE ACTIVE
+        </span>
+    </div>
+
+</div>
+
+
+<!-- Correlated Cluster Table -->
+<div class="overflow-hidden rounded-xl border border-slate-700 bg-slate-900">
+
+    <!-- Table Header -->
+    <div class="grid grid-cols-[2fr_1fr_1fr_1fr_1.5fr_auto] gap-4 border-b border-slate-700 bg-slate-950 px-5 py-4 text-xs font-semibold uppercase tracking-wider text-slate-400">
+        <div>Correlated Cluster</div>
+        <div>Risk Score</div>
+        <div>Risk Level</div>
+        <div>Confidence</div>
+        <div>MITRE ATT&CK</div>
+        <div>Alerts</div>
+    </div>
+
+    <!-- Cluster Rows -->
+    <div id="clusterTableBody" class="divide-y divide-slate-800">
+        <div
+            class="px-6 py-12 text-center text-sm text-slate-500"
+            id="clustersLoading"
+        >
+            Loading clusters…
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex items-center justify-between border-t border-slate-700 bg-slate-950 px-5 py-3">
+
+        <div class="text-xs text-slate-500">
+            Showing
+            <span
+                class="font-semibold text-slate-300"
+                id="clusterCount"
+            >
+                0
+            </span>
+            correlated clusters
+        </div>
+
+        <div class="flex items-center gap-2 text-xs text-emerald-400">
+            <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+            Correlation view active
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Simulation Notice -->
+<div class="rounded-lg border border-slate-700 bg-slate-950/60 px-4 py-3">
+
+    <div class="flex items-start gap-3">
+
+        <span class="mt-0.5 text-cyan-400">ⓘ</span>
+
+        <div>
+            <p class="text-xs font-semibold text-slate-300">
+                Correlation Intelligence — Demo Environment
+            </p>
+
+            <p class="mt-1 text-xs leading-relaxed text-slate-500">
+                Cluster membership, risk scores, confidence values, and ATT&CK
+                mappings are generated from the simulated ARES backend pipeline.
+                No live security infrastructure is connected.
+            </p>
+        </div>
+
+    </div>
+
+</div>
+```
+
+</div>
+
+<style>
+    .cluster-row > summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .cluster-row > summary::marker {
+        display: none;
+    }
+
+    .cluster-row[open] > summary {
+        background: rgba(30, 41, 59, 0.65);
+    }
+</style>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+(function () {
+
+    // -----------------------------------------------------------------------
+    // Helpers
+    // -----------------------------------------------------------------------
+
+    function escHtml(str) {
+        return String(str ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+
+    function riskScoreColor(score) {
+        if (score >= 80) return 'text-red-400';
+        if (score >= 60) return 'text-amber-400';
+        return 'text-emerald-400';
+    }
+
+
+    function riskLevelBadge(level) {
+
+        const l = (level || '').toUpperCase();
+
+        const map = {
+            'CRITICAL':
+                'border-red-500/30 bg-red-500/10 text-red-400',
+
+            'HIGH':
+                'border-orange-500/30 bg-orange-500/10 text-orange-400',
+
+            'MEDIUM':
+                'border-amber-500/30 bg-amber-500/10 text-amber-400',
+
+            'LOW':
+                'border-emerald-500/30 bg-emerald-500/10 text-emerald-400',
+
+            'LIKELY_FALSE_POSITIVE':
+                'border-slate-500/30 bg-slate-500/10 text-slate-400',
+        };
+
+        const cls = map[l] || map['LOW'];
+
+        return `
+            <span
+                class="rounded-md border ${cls} px-2 py-1 text-xs font-semibold"
+            >
+                ${escHtml(l || 'UNKNOWN')}
+            </span>
+        `;
+    }
+
+
+    function severityHintBadge(hint) {
+
+        const h = (hint || '').toUpperCase();
+
+        const map = {
+            'CRITICAL':
+                'border-red-500/20 bg-red-500/10 text-red-400',
+
+            'HIGH':
+                'border-orange-500/20 bg-orange-500/10 text-orange-400',
+
+            'MEDIUM':
+                'border-amber-500/20 bg-amber-500/10 text-amber-400',
+        };
+
+        const cls = map[h];
+
+        if (!cls) {
+            return '<span class="text-xs text-slate-500">—</span>';
+        }
+
+        return `
+            <span
+                class="rounded border ${cls} px-2 py-0.5 text-xs font-semibold"
+            >
+                ${escHtml(h)}
+            </span>
+        `;
+    }
+
+
+    function formatTs(ts) {
+
+        if (!ts) {
+            return '—';
+        }
+
+        try {
+            return new Date(ts).toLocaleString();
+        } catch {
+            return ts;
+        }
+    }
+
+
+    // -----------------------------------------------------------------------
+    // Render one alert row inside the expanded cluster table
+    // -----------------------------------------------------------------------
+
+    function renderAlertRow(alert) {
+
+        return `
+        <tr class="hover:bg-slate-800/30">
+
+            <td class="px-4 py-3 font-mono text-xs text-cyan-400">
+                ${escHtml(alert.alert_id)}
+            </td>
+
+            <td class="px-4 py-3 text-xs text-slate-400">
+                ${escHtml(formatTs(alert.timestamp))}
+            </td>
+
+            <td class="px-4 py-3">
+
+                <div class="text-xs font-medium text-slate-200">
+                    ${escHtml(alert.title)}
+                </div>
+
+                <div class="mt-0.5 max-w-[280px] truncate text-[10px] text-slate-500">
+                    ${escHtml((alert.raw_text || '').slice(0, 120))}
+                </div>
+
+            </td>
+
+            <td class="px-4 py-3">
+
+                <span class="rounded border border-slate-700 bg-slate-900 px-2 py-0.5 text-[10px] text-slate-400">
+                    ${escHtml(alert.source)}
+                </span>
+
+            </td>
+
+            <td class="px-4 py-3 text-xs text-slate-300">
+                ${escHtml(alert.entity)}
+            </td>
+
+            <td class="px-4 py-3">
+                ${severityHintBadge(alert.severity_hint)}
+            </td>
+
+            <td class="px-4 py-3 text-xs text-slate-500">
+                —
+            </td>
+
+        </tr>
+        `;
+    }
+
+
+    // -----------------------------------------------------------------------
+    // Render one cluster row
+    // -----------------------------------------------------------------------
+
+    function renderClusterRow(cluster) {
+
+        const alerts =
+            cluster.alerts || [];
+
+        const techniques =
+            cluster.attack_techniques || [];
+
+        const basis =
+            (cluster.correlation_basis || []).join(', ')
+            || 'indicator';
+
+        const confidencePct =
+            Math.round((cluster.confidence || 0) * 100);
+
+
+        // Display title
+        const title =
+            techniques.length > 0 &&
+            techniques[0].technique_name !== 'Unclassified'
+
+                ? techniques[0].technique_name
+
+                : `Cluster — ${basis}`;
+
+
+        // ATT&CK badges
+        const shownTech =
+            techniques.slice(0, 3);
+
+        const overflowCnt =
+            techniques.length -
+            shownTech.length;
+
+        const techBadges =
+            shownTech
+                .map(function (t) {
+
+                    return `
+                        <span
+                            class="rounded border
+                                   border-cyan-500/20
+                                   bg-cyan-500/10
+                                   px-2 py-1
+                                   font-mono
+                                   text-xs
+                                   text-cyan-300"
+                        >
+                            ${escHtml(t.technique_id)}
+                        </span>
+                    `;
+
+                })
+                .join('');
+
+
+        const techOverflow =
+            overflowCnt > 0
+
+                ? `
+                    <span
+                        class="px-1 py-1
+                               text-xs
+                               text-slate-500"
+                    >
+                        +${overflowCnt}
+                    </span>
+                  `
+
+                : '';
+
+
+        // Unique entities
+        const entities =
+            [
+                ...new Set(
+                    alerts
+                        .map(function (a) {
+                            return a.entity;
+                        })
+                        .filter(Boolean)
+                )
+            ];
+
+
+        const entityDisplay =
+            entities.length > 0
+                ? entities.join(', ')
+                : 'Multiple entities';
+
+
+        // Member alerts
+        const alertRowsHtml =
+            alerts.length > 0
+
+                ? alerts
+                    .map(renderAlertRow)
+                    .join('')
+
+                : `
+                    <tr>
+                        <td
+                            colspan="7"
+                            class="px-4 py-8
+                                   text-center
+                                   text-sm
+                                   text-slate-500"
+                        >
+                            No member alerts.
+                        </td>
+                    </tr>
+                  `;
+
+
+        return `
+        <details class="cluster-row group">
+
+            <summary
+                class="grid
+                       cursor-pointer
+                       list-none
+                       grid-cols-[2fr_1fr_1fr_1fr_1.5fr_auto]
+                       items-center
+                       gap-4
+                       px-5 py-4
+                       transition
+                       hover:bg-slate-800/60"
+            >
+
+                <div class="flex items-center gap-3">
+
+                    <span
+                        class="cluster-chevron
+                               text-slate-500
+                               transition
+                               group-open:rotate-90"
+                    >
+                        ▶
+                    </span>
+
+                    <div>
+
+                        <div
+                            class="font-mono
+                                   text-sm
+                                   font-semibold
+                                   text-cyan-300"
+                        >
+                            ${escHtml(cluster.cluster_id)}
+                        </div>
+
+                        <div
+                            class="mt-1
+                                   text-sm
+                                   font-medium
+                                   text-slate-200"
+                        >
+                            ${escHtml(title)}
+                        </div>
+
+                        <div
+                            class="mt-1
+                                   text-xs
+                                   text-slate-500"
+                        >
+                            ${alerts.length} correlated events
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div>
+
+                    <span
+                        class="text-lg
+                               font-bold
+                               ${riskScoreColor(cluster.risk_score)}"
+                    >
+                        ${escHtml(cluster.risk_score)}
+                    </span>
+
+                    <span class="text-xs text-slate-500">
+                        /100
+                    </span>
+
+                </div>
+
+
+                <div>
+                    ${riskLevelBadge(cluster.risk_level)}
+                </div>
+
+
+                <div
+                    class="text-sm
+                           font-semibold
+                           text-slate-200"
+                >
+                    ${confidencePct}%
+                </div>
+
+
+                <div class="flex flex-wrap gap-1">
+                    ${techBadges}
+                    ${techOverflow}
+                </div>
+
+
+                <div>
+
+                    <span
+                        class="rounded-full
+                               bg-slate-800
+                               px-3 py-1
+                               text-sm
+                               font-semibold
+                               text-slate-200"
+                    >
+                        ${alerts.length}
+                    </span>
+
+                </div>
+
+            </summary>
+
+
+            <!-- Expanded cluster details -->
+            <div
+                class="border-t
+                       border-slate-700
+                       bg-slate-950/70
+                       px-5 py-5"
+            >
+
+                <div class="mb-4 grid gap-3 md:grid-cols-3">
+
+                    <div
+                        class="rounded-lg
+                               border
+                               border-slate-700
+                               bg-slate-900
+                               p-3"
+                    >
+
+                        <div
+                            class="text-xs
+                                   uppercase
+                                   tracking-wide
+                                   text-slate-500"
+                        >
+                            Correlation Basis
+                        </div>
+
+                        <div
+                            class="mt-1
+                                   text-sm
+                                   text-slate-300"
+                        >
+                            ${escHtml(basis)}
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="rounded-lg
+                               border
+                               border-slate-700
+                               bg-slate-900
+                               p-3"
+                    >
+
+                        <div
+                            class="text-xs
+                                   uppercase
+                                   tracking-wide
+                                   text-slate-500"
+                        >
+                            Primary Entity
+                        </div>
+
+                        <div
+                            class="mt-1
+                                   font-mono
+                                   text-sm
+                                   text-cyan-300"
+                        >
+                            ${escHtml(entityDisplay)}
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="rounded-lg
+                               border
+                               border-slate-700
+                               bg-slate-900
+                               p-3"
+                    >
+
+                        <div
+                            class="text-xs
+                                   uppercase
+                                   tracking-wide
+                                   text-slate-500"
+                        >
+                            Cluster Status
+                        </div>
+
+                        <div
+                            class="mt-1
+                                   text-sm
+                                   text-emerald-400"
+                        >
+                            Correlated
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="mb-3
+                           flex
+                           items-center
+                           justify-between"
+                >
+
+                    <h4
+                        class="text-sm
+                               font-semibold
+                               text-slate-200"
+                    >
+                        Member Alerts
+                    </h4>
+
+                    <span
+                        class="text-xs
+                               text-slate-500"
+                    >
+                        Raw events belonging to
+                        ${escHtml(cluster.cluster_id)}
+                    </span>
+
+                </div>
+
+
+                <div
+                    class="overflow-x-auto
+                           rounded-lg
+                           border
+                           border-slate-700"
+                >
+
+                    <table
+                        class="min-w-full
+                               divide-y
+                               divide-slate-800"
+                    >
+
+                        <thead class="bg-slate-900">
+
+                            <tr
+                                class="text-left
+                                       text-xs
+                                       uppercase
+                                       tracking-wider
+                                       text-slate-500"
+                            >
+
+                                <th class="px-4 py-3">
+                                    Alert ID
+                                </th>
+
+                                <th class="px-4 py-3">
+                                    Timestamp
+                                </th>
+
+                                <th class="px-4 py-3">
+                                    Alert
+                                </th>
+
+                                <th class="px-4 py-3">
+                                    Source
+                                </th>
+
+                                <th class="px-4 py-3">
+                                    Entity / Asset
+                                </th>
+
+                                <th class="px-4 py-3">
+                                    Severity
+                                </th>
+
+                                <th class="px-4 py-3">
+                                    Status
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody
+                            class="divide-y
+                                   divide-slate-800"
+                        >
+                            ${alertRowsHtml}
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </details>
+        `;
+    }
+
+
+    // -----------------------------------------------------------------------
+    // Fetch /api/clusters
+    // -----------------------------------------------------------------------
+
+    async function fetchClusters() {
+
+        const body =
+            document.getElementById(
+                'clusterTableBody'
+            );
+
+        const counter =
+            document.getElementById(
+                'clusterCount'
+            );
+
+
+        try {
+
+            const res =
+                await fetch('/api/clusters');
+
+
+            if (!res.ok) {
+                throw new Error(
+                    `HTTP ${res.status}`
+                );
+            }
+
+
+            const clusters =
+                await res.json();
+
+
+            if (!clusters.length) {
+
+                body.innerHTML = `
+                    <div
+                        class="px-6 py-12
+                               text-center"
+                    >
+
+                        <div
+                            class="text-3xl
+                                   text-slate-600"
+                        >
+                            ◌
+                        </div>
+
+                        <h3
+                            class="mt-3
+                                   text-sm
+                                   font-semibold
+                                   text-slate-300"
+                        >
+                            No correlated clusters found
+                        </h3>
+
+                        <p
+                            class="mt-1
+                                   text-sm
+                                   text-slate-500"
+                        >
+                            The pipeline produced no clusters.
+                        </p>
+
+                    </div>
+                `;
+
+                counter.textContent = '0';
+
+                return;
+            }
+
+
+            body.innerHTML =
+                clusters
+                    .map(renderClusterRow)
+                    .join('');
+
+
+            counter.textContent =
+                clusters.length;
+
+
+        } catch (err) {
+
+            body.innerHTML = `
+                <div
+                    class="px-6 py-12
+                           text-center
+                           text-sm
+                           text-red-400"
+                >
+                    Failed to load clusters:
+                    ${escHtml(err.message)}
+                </div>
+            `;
+
+            console.error(
+                'fetchClusters error:',
+                err
+            );
+        }
+
+    }
+
+
+    fetchClusters();
+
+}());
+</script>
+
+{% endblock %}

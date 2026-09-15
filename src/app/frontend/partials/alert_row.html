@@ -1,0 +1,360 @@
+<tr
+    class="
+        border-b
+        border-[#1C3048]
+        hover:bg-[#0C1928]
+        transition
+    "
+    data-alert-id="{{ alert.id }}"
+>
+
+    <!-- ALERT ID -->
+
+    <td class="px-3 py-3">
+
+        <span
+            class="
+                text-[10px]
+                font-semibold
+                text-cyan-400
+            "
+        >
+            {{ alert.id }}
+        </span>
+
+    </td>
+
+
+    <!-- TIMESTAMP -->
+
+    <td class="px-3 py-3">
+
+        <span class="text-[10px] text-slate-400">
+            {{ alert.timestamp }}
+        </span>
+
+    </td>
+
+
+    <!-- TITLE -->
+
+    <td class="px-3 py-3 min-w-[220px]">
+
+        <div>
+
+            <p
+                class="
+                    text-[10px]
+                    font-medium
+                    text-slate-200
+                "
+            >
+                {{ alert.title }}
+            </p>
+
+            {% if alert.description %}
+
+            <p
+                class="
+                    text-[9px]
+                    text-slate-600
+                    mt-1
+                    truncate
+                    max-w-[240px]
+                "
+            >
+                {{ alert.description }}
+            </p>
+
+            {% endif %}
+
+        </div>
+
+    </td>
+
+
+    <!-- SOURCE -->
+
+    <td class="px-3 py-3">
+
+        <span
+            class="
+                px-2
+                py-1
+                rounded
+                border
+                border-[#1C3048]
+                bg-[#081321]
+                text-[9px]
+                text-slate-400
+            "
+        >
+            {{ alert.source }}
+        </span>
+
+    </td>
+
+
+    <!-- ASSET -->
+
+    <td class="px-3 py-3">
+
+        <span class="text-[10px] text-slate-400">
+            {{ alert.asset }}
+        </span>
+
+    </td>
+
+
+    <!-- USER -->
+
+    <td class="px-3 py-3">
+
+        <span class="text-[10px] text-slate-400">
+            {{ alert.user }}
+        </span>
+
+    </td>
+
+
+    <!-- SEVERITY -->
+
+    <td class="px-3 py-3">
+
+        {% if alert.severity == "Critical" %}
+
+        <span
+            class="
+                inline-flex
+                px-2
+                py-1
+                rounded
+                border
+                border-red-500/20
+                bg-red-500/10
+                text-[9px]
+                text-red-400
+            "
+        >
+            CRITICAL
+        </span>
+
+        {% elif alert.severity == "High" %}
+
+        <span
+            class="
+                inline-flex
+                px-2
+                py-1
+                rounded
+                border
+                border-orange-500/20
+                bg-orange-500/10
+                text-[9px]
+                text-orange-400
+            "
+        >
+            HIGH
+        </span>
+
+        {% elif alert.severity == "Medium" %}
+
+        <span
+            class="
+                inline-flex
+                px-2
+                py-1
+                rounded
+                border
+                border-amber-500/20
+                bg-amber-500/10
+                text-[9px]
+                text-amber-400
+            "
+        >
+            MEDIUM
+        </span>
+
+        {% else %}
+
+        <span
+            class="
+                inline-flex
+                px-2
+                py-1
+                rounded
+                border
+                border-slate-500/20
+                bg-slate-500/10
+                text-[9px]
+                text-slate-400
+            "
+        >
+            LOW
+        </span>
+
+        {% endif %}
+
+    </td>
+
+
+    <!-- RISK -->
+
+    <td class="px-3 py-3">
+
+        {% if alert.risk >= 85 %}
+
+        <span class="text-[10px] font-bold text-red-400">
+            {{ alert.risk }}
+        </span>
+
+        {% elif alert.risk >= 65 %}
+
+        <span class="text-[10px] font-bold text-amber-400">
+            {{ alert.risk }}
+        </span>
+
+        {% else %}
+
+        <span class="text-[10px] font-bold text-green-400">
+            {{ alert.risk }}
+        </span>
+
+        {% endif %}
+
+    </td>
+
+
+    <!-- CORRELATION -->
+
+    <td class="px-3 py-3">
+
+        {% if alert.correlation_status == "Correlated" %}
+
+        <span
+            class="
+                text-[9px]
+                text-purple-400
+            "
+        >
+            ● Correlated
+        </span>
+
+        {% elif alert.correlation_status == "Candidate" %}
+
+        <span
+            class="
+                text-[9px]
+                text-amber-400
+            "
+        >
+            ● Candidate
+        </span>
+
+        {% else %}
+
+        <span
+            class="
+                text-[9px]
+                text-slate-500
+            "
+        >
+            ● Uncorrelated
+        </span>
+
+        {% endif %}
+
+    </td>
+
+
+    <!-- STATUS -->
+
+    <td class="px-3 py-3">
+
+        {% if alert.status == "Open" %}
+
+        <span
+            class="
+                text-[9px]
+                text-red-400
+            "
+        >
+            OPEN
+        </span>
+
+        {% elif alert.status == "Investigating" %}
+
+        <span
+            class="
+                text-[9px]
+                text-cyan-400
+            "
+        >
+            INVESTIGATING
+        </span>
+
+        {% elif alert.status == "Reviewed" %}
+
+        <span
+            class="
+                text-[9px]
+                text-green-400
+            "
+        >
+            REVIEWED
+        </span>
+
+        {% elif alert.status == "Closed" %}
+
+        <span
+            class="
+                text-[9px]
+                text-slate-500
+            "
+        >
+            CLOSED
+        </span>
+
+        {% else %}
+
+        <span
+            class="
+                text-[9px]
+                text-slate-400
+            "
+        >
+            {{ alert.status }}
+        </span>
+
+        {% endif %}
+
+    </td>
+
+
+    <!-- ACTION -->
+
+    <td class="px-3 py-3">
+
+        <button
+            type="button"
+            class="
+                alert-view-btn
+                px-2.5
+                py-1.5
+                rounded
+                border
+                border-[#1C3048]
+                text-[9px]
+                text-slate-400
+                hover:text-cyan-400
+                hover:border-cyan-500
+                transition
+            "
+            data-alert-id="{{ alert.id }}"
+        >
+            View
+        </button>
+
+    </td>
+
+</tr>

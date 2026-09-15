@@ -1,0 +1,282 @@
+{#
+    ARES — Threat Intelligence Command Center
+    Partial: BLUF Report Card
+    DEMO DATA ONLY
+#}
+
+<div
+    class="panel group hover:border-slate-700 transition-colors duration-200"
+    data-report-id="{{ report.id }}"
+>
+
+    <!-- Header -->
+    <div class="flex items-start justify-between gap-4 px-5 py-4 border-b border-slate-800">
+
+        <div class="flex items-start gap-3">
+
+            <!-- Report Icon -->
+            <div class="w-10 h-10 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0">
+
+                <svg
+                    class="w-5 h-5 text-blue-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.5"
+                        d="M9 12h6m-6 4h4m-7 5h10a2 2 0 002-2V7.828a2 2 0 00-.586-1.414l-3.828-3.828A2 2 0 008.172 2H6a2 2 0 00-2 2v15a2 2 0 002 2z"
+                    />
+                </svg>
+
+            </div>
+
+
+            <div>
+
+                <div class="flex items-center gap-2">
+
+                    <span class="text-xs font-mono text-cyan-400">
+                        {{ report.id }}
+                    </span>
+
+                    {% if report.status == "Published" %}
+
+                        <span class="badge badge-green">
+                            Published
+                        </span>
+
+                    {% elif report.status == "Draft" %}
+
+                        <span class="badge badge-amber">
+                            Draft
+                        </span>
+
+                    {% elif report.status == "Reviewed" %}
+
+                        <span class="badge badge-blue">
+                            Reviewed
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge badge-slate">
+                            {{ report.status }}
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <h3 class="text-sm font-semibold text-slate-100 mt-1 group-hover:text-cyan-400 transition-colors">
+                    {{ report.title }}
+                </h3>
+
+            </div>
+
+        </div>
+
+
+        <!-- Priority -->
+        <div class="text-right shrink-0">
+
+            <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                Priority
+            </div>
+
+            {% if report.priority == "Critical" %}
+
+                <span class="badge badge-red mt-1">
+                    Critical
+                </span>
+
+            {% elif report.priority == "High" %}
+
+                <span class="badge badge-amber mt-1">
+                    High
+                </span>
+
+            {% elif report.priority == "Medium" %}
+
+                <span class="badge badge-blue mt-1">
+                    Medium
+                </span>
+
+            {% else %}
+
+                <span class="badge badge-slate mt-1">
+                    {{ report.priority }}
+                </span>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- BLUF -->
+    <div class="px-5 py-4">
+
+        <div class="mb-4">
+
+            <div class="flex items-center gap-2 mb-2">
+
+                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+
+                <span class="text-[10px] uppercase tracking-wider font-semibold text-cyan-400">
+                    Bottom Line Up Front
+                </span>
+
+            </div>
+
+            <p class="text-sm leading-6 text-slate-300">
+                {{ report.bluf }}
+            </p>
+
+        </div>
+
+
+        <!-- Report Metrics -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-slate-800">
+
+            <!-- Risk -->
+            <div>
+
+                <div class="text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                    Risk Score
+                </div>
+
+                {% if report.risk >= 80 %}
+
+                    <div class="text-lg font-bold text-red-400">
+                        {{ report.risk }}
+                    </div>
+
+                {% elif report.risk >= 60 %}
+
+                    <div class="text-lg font-bold text-amber-400">
+                        {{ report.risk }}
+                    </div>
+
+                {% else %}
+
+                    <div class="text-lg font-bold text-green-400">
+                        {{ report.risk }}
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- Evidence -->
+            <div>
+
+                <div class="text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                    Evidence
+                </div>
+
+                <div class="text-lg font-bold text-slate-200">
+                    {{ report.evidence_count }}
+                </div>
+
+            </div>
+
+
+            <!-- MITRE -->
+            <div>
+
+                <div class="text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                    MITRE Mapping
+                </div>
+
+                <div class="text-lg font-bold text-cyan-400">
+                    {{ report.mitre_count }}
+                </div>
+
+            </div>
+
+
+            <!-- Recommendations -->
+            <div>
+
+                <div class="text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                    Actions
+                </div>
+
+                <div class="text-lg font-bold text-slate-200">
+                    {{ report.recommendation_count }}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Metadata -->
+    <div class="px-5 py-3 border-t border-slate-800 bg-slate-950/30">
+
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+
+            <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] text-slate-500">
+
+                <span>
+                    Investigation:
+                    <span class="font-mono text-slate-400">
+                        {{ report.investigation_id }}
+                    </span>
+                </span>
+
+                <span>
+                    Analyst:
+                    <span class="text-slate-400">
+                        {{ report.analyst }}
+                    </span>
+                </span>
+
+                <span>
+                    Generated:
+                    <span class="text-slate-400">
+                        {{ report.generated }}
+                    </span>
+                </span>
+
+            </div>
+
+
+            <!-- Action -->
+            <button
+                type="button"
+                onclick="openReport('{{ report.id }}')"
+                class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md border border-slate-700 bg-slate-900 text-xs font-medium text-slate-300 hover:text-cyan-400 hover:border-cyan-500/30 transition-colors"
+            >
+
+                View Report
+
+                <svg
+                    class="w-3.5 h-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.5"
+                        d="M9 5l7 7-7 7"
+                    />
+                </svg>
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
